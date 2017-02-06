@@ -21,7 +21,8 @@
 !   +------------------------------------------------------+
 !                         
 !
-!
+! v1.1 - DM, February 2017
+!        Ported to GNU gfortran and added two NV=3 models
 !
  module STRATA 
 ! defines the kinds an PI 
@@ -13813,12 +13814,16 @@ ENDIF   ! Endif on NV=2
 ! NV=3  CODE=4 ---> Similar to W. R. Peltier [1985], LT=  120 km.
 ! NV=3  CODE=5 ---> Paul Johnston [benchmark, 1997], LT= 70 km.
 !
+! NEW -- Feb 06, 2017
+! NV=3  CODE=6 ---> Vermeersen & Sabadini LT= 120 km.
+! NV=3  CODE=7 ---> Model "M3-L70-V01" reference model for the "Test suite" - 2009
 !
-If( (CODE<0 .or. CODE>5) .and. iv==0) Then
+!
+If( (CODE<0 .or. CODE>7) .and. iv==0) Then
 Write(99,*)'ERROR in Sbr SPEC: The CODE is not available'
 Write(99,*)'**** JOB ABORTED ***************************';stop
 Endif
-If( (CODE<0 .or. CODE>5) .and. iv==1) Then
+If( (CODE<0 .or. CODE>7) .and. iv==1) Then
 Write(*,*) 'ERROR in Sbr SPEC: The CODE is not available'
 Write(*,*) '**** JOB ABORTED ***************************';Stop
 Endif
@@ -13969,6 +13974,40 @@ nroots=4*nv
 r (0)      = 3480._qp; rho(0)=10750._qp; rmu(0)=0._qp          ! Core 
 r (1)      = 5701._qp; rho(1)=4978._qp ; rmu(1)=2.2834_qp      ! Lower mantle
 r (2)      = 5951._qp; rho(2)=3871._qp ; rmu(2)=1.0549_qp      ! TZ  
+r (3)      = 6301._qp; rho(3)=3438._qp ; rmu(3)=0.70363_qp     ! Upper mantle
+r (4)      = 6371._qp; rho(4)=3037._qp ; rmu(4)=0.50605_qp     ! Litosphere
+!
+endif 
+!
+!
+if(CODE == 6) then   ! 
+!
+write(99,*) '3-- layer mantle model by Vermeersen and Sabadini 1996'
+IF(iv==1) &
+write( *,*) '3-- layer mantle model by Vermeersen and Sabadini 1996'
+!
+nroots=4*nv
+!
+r (0)      = 3480._qp; rho(0)=10932._qp; rmu(0)=0._qp        ! Core 
+r (1)      = 5701._qp; rho(1)=4878._qp ; rmu(1)=2.19_qp      ! Lower mantle
+r (2)      = 5951._qp; rho(2)=3857._qp ; rmu(2)=1.06_qp      ! TZ  
+r (3)      = 6250._qp; rho(3)=3434._qp ; rmu(3)=0.727_qp     ! Upper mantle
+r (4)      = 6371._qp; rho(4)=3184._qp ; rmu(4)=0.602_qp     ! Litosphere
+!
+endif 
+!
+!
+if(CODE == 7) then   ! Test suite model M3-L70-V01 
+!
+write(99,*) '3-- layer mantle model (Test suite model M3-L70-V01)'
+IF(iv==1) &
+write( *,*) '3-- layer mantle model (Test suite model M3-L70-V01)'
+!
+nroots=4*nv
+!
+r (0)      = 3480._qp; rho(0)=10750._qp; rmu(0)=0._qp          ! Core 
+r (1)      = 5701._qp; rho(1)=4978._qp ; rmu(1)=2.28340_qp     ! Lower mantle
+r (2)      = 5951._qp; rho(2)=3871._qp ; rmu(2)=1.05490_qp     ! TZ  
 r (3)      = 6301._qp; rho(3)=3438._qp ; rmu(3)=0.70363_qp     ! Upper mantle
 r (4)      = 6371._qp; rho(4)=3037._qp ; rmu(4)=0.50605_qp     ! Litosphere
 !
