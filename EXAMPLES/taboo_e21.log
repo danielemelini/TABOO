@@ -1,0 +1,78 @@
+ # 2017.02.06 time=14.03.06
+ Detecting the Active INPUT file !
+ task_1.dat is NOT active 
+ task_2.dat is active 
+ task_3.dat is NOT active 
+ Opening file task_2.dat ...  
+ Reading file task_2.dat ...  
+ > found KEYWORD  Harmonic_Degrees              
+ Lmin and Lmax            2          72
+ Elastic AND viscous fields
+ The 'non physical' modes will NOT be killed
+ > found KEYWORD  Make_Model                    
+ Building the model 
+ Number of VE layers                 2
+ Model CODE is                       2
+ From input, the lithospheric thickness is     100.0000  km
+ The ILM parameter (for NV=7 and 9) is set to     0
+ Mantle viscosity from BOTTOM to TOP (/1E21) 
+ Viscosity of layer   1 =    2.0000
+ Viscosity of layer   2 =    1.0000
+ Yuen Sabadini Boschi [1982], LT= 100 km
+ ---------------------------------------------------------------
+  Radii, densities, shear moduli & viscosity from bottom to top 
+         SI units: m, kg/m**3, Pa, Pa.s, respectively           
+ ---------------------------------------------------------------
+   0   0.34800000E+07  0.10927000E+05  0.00000000E+00  0.00000000E+00
+   1   0.57010000E+07  0.49190000E+04  0.21700000E+12  0.20000000E+22
+   2   0.62710000E+07  0.44300000E+04  0.83700000E+11  0.10000000E+22
+   3   0.63710000E+07  0.26890000E+04  0.28200000E+11  0.00000000E+00
+ Lithospheric thickness effectively employed (km) =    100.0000
+ Looking for density inversions...
+ No density inversions found
+ -----------------------------------
+  Gravity at the interfaces (m/s/s) 
+        (from bottom to top)        
+ -----------------------------------
+   0  0.10624161E+02
+   1  0.10011667E+02
+   2  0.10204301E+02
+   3  0.10108346E+02
+ Writing the spectrum on file spectrum.dat
+ Writing the elastic, fluid, and v-elastic h ldc on h.dat 
+ Writing the elastic, fluid, and v-elastic l ldc on l.dat 
+ Writing the elastic, fluid, and v-elastic k ldc on k.dat 
+ Done with the computation of the Spectral quantities 
+ Looking now for KWs Load_Geometry and Load_History
+ > found KEYWORD  Load_Geometry                 
+ Reading the load geometry
+ Disk load (CL=10)
+ Longitude of the centre (deg) =   0.0000000000000000     
+ Colatitude of the centre (deg) =   0.0000000000000000     
+ Amplitude (deg) =   15.000000000000000     
+ The load is NOT compensated on a realistic ocean
+ > found KEYWORD  Load_History                  
+ Reading the load time-history 
+ Time-history #4: Saw-tooth time history
+ There are           6  glacial phases
+ The loading phase is    90.0000000     kyrs long
+ The un-loading phase is    10.0000000     kyrs long
+ Done with Load_Geometry and Load_History
+ Looking now for KWs Local_Study or Global_Study
+ > found KEYWORD  Local_Study                   
+ The following variables will be computed and printed:
+ -> Radial displacement
+ -> Tangential displacement
+ -> Geoid Heigth
+ -> Radial velocity
+ -> Tangential velocity
+ -> Rate of change of the geoid heigth
+ Local Study of Type#3
+ There are         182  observers along the selected meridian 
+ The Sbr. AXIS_DISP0 is employed (see the User Guide)
+ task_2.dat is being closed... done 
+ The KWs Local_Study (Global_Study) are been configured correctly
+ Writing the harmonic components of the load on file load_coeff.dat
+ The Maximum Load MASS is    1.8075226436413913E+019 kg
+ Computing for Local Study of Type#3
+ # Closing this file (taboo.log) on2017.02.06 time=14.03.06
