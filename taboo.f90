@@ -8,15 +8,15 @@
 !   |                +---++---++---++------+               |
 !   |                                                      |
 !   |        ( a posT glAcial reBOund calculatOr )         |
-!   |							   |
+!   |                                                      |
 !   |                by Giorgio Spada et al. 	           |
 !   |                                                      |
-!   |							   |	 
-!   |              Release 1.0 -  October 2003             |
 !   |                                                      |
-!   |     						   |
-!   |               http://samizdat.mines.edu 		   |
-!   |					 	           |
+!   |              Release 1.1 -  February 2017            |
+!   |                                                      |
+!   |                                                      |
+!   |         http://github.com/danielemelini/TABOO        |
+!   |                                                      |
 !   |                                                      |
 !   +------------------------------------------------------+
 !                         
@@ -33,6 +33,81 @@
  integer, parameter  :: qp    = kind(1.0q0)
  real(qp), parameter :: pi    = 3.141592653589793238462643383279502884197_qp
  end module STRATA 
+!
+!
+!
+!
+!
+module trigfcn
+! defines trigonometric functions with input in degrees
+  implicit none
+!
+  private
+!
+  integer, parameter :: sp = kind(1.e0), dp = kind(1.d0), qp = kind(1.q0)
+  real(sp), parameter :: d2r_sp = 4 * atan(1.0_sp) / 180.0_sp
+  real(dp), parameter :: d2r_dp = 4 * atan(1.0_dp) / 180.0_dp
+  real(qp), parameter :: d2r_qp = 4 * atan(1.0_qp) / 180.0_qp
+!
+  public sind, cosd
+!
+  interface sind
+    module procedure ssind ! Single precision 
+    module procedure dsind ! Double precision
+    module procedure qsind ! Quad precision
+  end interface
+!
+  interface cosd
+    module procedure scosd ! Single precision 
+    module procedure dcosd ! Double precision
+    module procedure qcosd ! Quad precision
+  end interface
+!  
+  contains
+!
+    function ssind(x)
+      implicit none
+      real(sp) :: ssind
+      real(sp) :: x
+      ssind = sin(d2r_sp * x)
+    end function ssind
+!
+    function dsind(x)
+      implicit none
+      real(dp) :: dsind
+      real(dp) :: x
+      dsind = sin(d2r_dp * x)
+    end function dsind
+!
+    function qsind(x)
+      implicit none
+      real(qp) :: qsind
+      real(qp) :: x
+      qsind = sin(d2r_qp * x)
+    end function qsind
+!
+    function scosd(x)
+      implicit none
+      real(sp) :: scosd
+      real(sp) :: x
+      scosd = cos(d2r_sp * x)
+    end function scosd
+!
+    function dcosd(x)
+      implicit none
+      real(dp) :: dcosd
+      real(dp) :: x
+      dcosd = cos(d2r_dp * x)
+    end function dcosd
+!
+    function qcosd(x)
+      implicit none
+      real(qp) :: qcosd
+      real(qp) :: x
+      qcosd = cos(d2r_qp * x)
+    end function qcosd
+!
+end module trigfcn
 !
 !
 !
@@ -650,6 +725,7 @@ end module FOR_TASK3
 !
 !
  USE for_task3
+ USE trigfcn
  implicit NONE
 !
 !
@@ -2180,8 +2256,8 @@ IF (FRTD==1.AND.(name_agg=='Ice_1'.or.name_agg=='Ice_2')) THEN
 !
        C_L (j) = 10
 !
-       Amplit (j)    = acosd( 1.0 - sind(cola_c(j))*sind(d_cola(j)/2.)* &
-                              d_long(j)*pi/180.0/pi)
+       Amplit (j)    = acos( 1.0 - sind(cola_c(j))*sind(d_cola(j)/2.)* &
+                              d_long(j)*pi/180.0/pi)   * 180.0 / pi   ! It was 'acosd'
 !
    Write (99,*) &
             'After conversion, the element is of type CL = ',C_L(j)
@@ -3945,7 +4021,7 @@ ENDIF
 !   of site #2 w.r.t site #1. [done by GS in urbino on 18.02.2002] 
 !
 !
-  Use COMMON
+  Use COMMON; Use TRIGFCN
   Implicit NONE   
 !
   Real(DP), PARAMETER :: EPS=1d-4    ! A small angle (degrees) 
@@ -7137,7 +7213,7 @@ If(IG==1) CLOSE(51);  If(dIG==1) CLOSE(55)
 ! the oceanic load when real continent bounaries are employed.
 !
 !
- use COMMON; implicit NONE   
+ use COMMON; use TRIGFCN; implicit NONE   
 !
  real(dp) :: VECT(4), D_VECT(4) ! Solution vectors
  real(DP) :: CORR(4), D_CORR(4) ! Their time-derivatives
@@ -7375,7 +7451,7 @@ if( log_1 .or. log_2 ) then
 !+----------------------------------------------------------------+ 
    SUBROUTINE AXIS_STOK  (Ld, Md, IOC, inorm, CEN, VECT, D_VECT)  !           
 !+----------------------------------------------------------------+
-    use COMMON; implicit NONE
+    use COMMON; use TRIGFCN; implicit NONE
 !
 !	This routine computes the cosine (CI) and the sine STOKES
 !   coefficients (SI) at degree LD and order MD for a load of
@@ -7501,7 +7577,7 @@ if( log_1 .or. log_2 ) then
 !+-------------------------------------------------+ 
     SUBROUTINE AXIS_INER  (IOC, CEN, INE, D_INE)   !           
 !+-------------------------------------------------+
-    use COMMON; implicit NONE
+    use COMMON; use TRIGFCN; implicit NONE
 !
 !	This routine computes the change in the inertia tensor of
 !   the Earth INE and its time--derivatine D_INE for an axis-simmetric
@@ -9079,7 +9155,7 @@ x_el = x_el / rubens
 ! # Derivative of the secular polynomial
 !
 do ii = 0, 3 * 2 * nv - 1  
-ctmp (ii) = co (ii + 1) * qfloat (ii + 1)  
+ctmp (ii) = co (ii + 1) * float (ii + 1)  
 enddo  
 !
 do m = 1, nroots  
@@ -9304,7 +9380,7 @@ g (1, 3) = 1._qp
 g (2, 2) = 1._qp  
 g (3, 3) = ro * a * r  
 g (5, 1) = r**n  
-g (6, 1) = 2._qp * (qfloat (n) - 1._qp) * r** (n - 1)  
+g (6, 1) = 2._qp * (float (n) - 1._qp) * r** (n - 1)  
 g (6, 3) = 3._qp * a  
 !
 end subroutine COREBO 
@@ -9373,7 +9449,7 @@ integer (i4b) :: char, l
 !
 !
 real (qp) :: gamma  
-gamma = (2._qp * qfloat (l) + 1._qp) / 4._qp / pi / r (nv+1) / r (nv+1)  
+gamma = (2._qp * float (l) + 1._qp) / 4._qp / pi / r (nv+1) / r (nv+1)  
 !
 if (char == 1) then  
     bcs (1) = - g (nv+1) * gamma  
@@ -9411,7 +9487,7 @@ a(:,:) = 0._qp
 b(:,:) = 0._qp 
 !
 !
-rn = qfloat (n)  
+rn = float (n)  
 !
 h1 = rn + 1._qp  
 h2 = 1._qp + 2._qp * rn  
@@ -9446,10 +9522,10 @@ v (24) = - v (7)
 !
 a (1, 1) = r**( - n - 1) * v (2)  
 a (2, 1) = - r**( - n + 1) * v (4)  
-a (3, 1) = 3._qp * za * r**( - n + 1) / (2._qp * qfloat (n) + 1._qp)
+a (3, 1) = 3._qp * za * r**( - n + 1) / (2._qp * float (n) + 1._qp)
 a (4, 1) = r**(n) * v (6)  
 a (5, 1) = - r**(n + 2) * v (8)  
-a (6, 1) = - 3._qp * za * r**(n + 2) / (2._qp * qfloat (n) + 1._qp)  
+a (6, 1) = - 3._qp * za * r**(n + 2) / (2._qp * float (n) + 1._qp)  
 !
 a (1, 2) = - r**( - n - 1) * v (9)  
 a (2, 2) = r**( - n + 1) * v (10)  
@@ -9457,8 +9533,8 @@ a (4, 2) = - r**(n) * v (11)
 a (5, 2) = r**(n + 2) * v (12)  
 !
 a (6, 5) = - r**(n + 1)  
-a (3, 6) = - r**( - n + 1) / (2._qp * qfloat (n) + 1._qp)  
-a (6, 6) = r**(n + 2) / (2._qp * qfloat (n) + 1._qp)  
+a (3, 6) = - r**( - n + 1) / (2._qp * float (n) + 1._qp)  
+a (6, 6) = r**(n + 2) / (2._qp * float (n) + 1._qp)  
 !
 b (1, 1) = r**( - n) * rho * gra * v (1)  
 b (2, 1) = - r**( - n + 2) * rho * gra * v (3)  
@@ -9505,7 +9581,7 @@ a(:,:) = 0._qp
 b(:,:) = 0._qp 
 !
 !
-rn = qfloat (n)  
+rn = float (n)  
 !
 a1 = rn / (2._qp * (2._qp * rn + 3._qp) )  
 a2 = 1._qp  
@@ -9545,7 +9621,7 @@ a (5, 3) = a (3, 3) / rho
 a (5, 6) = a (3, 6) / rho  
 a (6, 1) = 3._qp * za * a (1, 1)  
 a (6, 2) = 3._qp * za * a (1, 2)  
-a (6, 3) = - (2._qp * qfloat (n) + 1._qp) * r** (n - 1)  
+a (6, 3) = - (2._qp * float (n) + 1._qp) * r** (n - 1)  
 a (6, 4) = 3._qp * za * a (1, 4)  
 a (6, 5) = 3._qp * za * a (1, 5)  
 !
@@ -9860,7 +9936,7 @@ ad = 0._qp
 bc = 0._qp  
 bd = 0._qp  
 !
-rn = qfloat (n)  
+rn = float (n)  
 x=rb
 y=rd
 !
@@ -10161,7 +10237,7 @@ end subroutine prem
 !
 ! 
 !
- use COMMON; implicit NONE
+ use COMMON; use TRIGFCN; implicit NONE
 !!
 !    
  real(dp)      :: AMPLITUDE    ! Half-amplitude of the load
@@ -10385,7 +10461,7 @@ aux =    (cheb(l+1,amplitude)-cheb(l+2,amplitude))/(float(l)+1.5d0) -        &
  SIGMA(l) = aux 
 ! 
 aux =    - (leg(l+1,0,cosd(amplitude)) - leg(l-1,0,cosd(amplitude)))       * & 
-         4._dp*(1._dp - dcosd(amplitude))**2/3._dp/(1._dp+cosd(amplitude))
+         4._dp*(1._dp - cosd(amplitude))**2/3._dp/(1._dp+cosd(amplitude))   ! Changed 'dcosd' to 'cosd'
 !
  SIGMA(l) = SIGMA(l) + aux 
 !
@@ -10401,7 +10477,7 @@ aux =    (cheb(1+1,amplitude)-cheb(1+2,amplitude))/(float(1)+1.5d0) -        &
  SIGMA(1) = aux
 ! 
 aux =    - (leg(1+1,0,cosd(amplitude)) - leg(1-1,0,cosd(amplitude)))       * &
-         4._dp*(1._dp - dcosd(amplitude))**2/3._dp/(1._dp+cosd(amplitude))
+         4._dp*(1._dp - cosd(amplitude))**2/3._dp/(1._dp+cosd(amplitude))  ! Changed 'dcosd' to 'cosd'
 !
  SIGMA(1) = SIGMA(1) + aux
 !
@@ -10508,7 +10584,7 @@ END SUBROUTINE AXIS_LOAD
 !
 !
 !
-use COMMON; implicit NONE
+use COMMON; use TRIGFCN; implicit NONE
 !
 !!
 REAL(dp),parameter ::dfi_min =  .25d0 ! Minimum allowed width in longitude (deg)
@@ -10831,7 +10907,7 @@ END SUBROUTINE RECT_LOAD0
 !  -------------------o
 ! chebichev polynomials of the 1st kind T_n(x)
 !
-use COMMON
+use COMMON; use TRIGFCN
 implicit none 
 real(dp) :: cheb, x
 integer(i4b) :: n 
@@ -12541,12 +12617,12 @@ end subroutine  Convol_8_new
 !          dconv_h, dconv_l, dconv_k = their time-derivatives
 !
 !
- If ((hi<0 .or .hi>8) .and. iv==0) then
+ If ((hi<0 .or. hi>8) .and. iv==0) then
   Write(99,*) 'ERROR IN SBR. CONVOL_load_history: Unknown  time history '
   Write(99,*) 'Only histories with label in the range [0:5] are allowed '
   Write(99,*) '******** JOB ABORTED *********************************** ';STOP
  Endif
- If ((hi<0 .or .hi>8) .and. iv==1) then
+ If ((hi<0 .or. hi>8) .and. iv==1) then
   Write(99,*) 'ERROR IN SBR. CONVOL_load_history: Unknown  time history '
   Write(99,*) 'Only histories with label in the range [0:8] are allowed '
   Write(99,*) '******** JOB ABORTED *********************************** '
@@ -12599,7 +12675,7 @@ END SUBROUTINE CONVOL_load_history
 ! -----------------------------------------------------------------+ 
 !
 !
- use COMMON; implicit NONE   
+ use COMMON; use TRIGFCN; implicit NONE   
 !
 !
 ! # This routine computes the components of vector VECT ==
@@ -12839,7 +12915,7 @@ END SUBROUTINE AXIS_DISP0
 !					                       |
 ! -------------------------------------------------------------+
 !
- use COMMON; implicit NONE   
+ use COMMON; use TRIGFCN; implicit NONE   
 !
 ! # This routine computes the surface load PP (mass per unit surface)
 !   for axissimmetric loads of the type 10, 11, 20, and 21 at the point
@@ -12926,7 +13002,7 @@ END SUBROUTINE AXIS_Pressure
        SUBROUTINE RECT_PRESSURE (observer, th, PP)   !
 !----------------------------------------------------+
 !
-  use COMMON; implicit NONE   
+  use COMMON; use TRIGFCN; implicit NONE   
 !
 !
 ! # This routine computes the surface load PP (mass per unit surface)
@@ -12991,7 +13067,7 @@ End Subroutine Rect_Pressure
 !--------------------------------------------------------------------------+
 !
 !
-  use COMMON; implicit NONE   
+  use COMMON; use TRIGFCN; implicit NONE   
 !
 ! # This routine computes the components of vector  VECT =
 !   (u_rad, u_teta, u_long, geoid) and its time-derivative
@@ -13166,7 +13242,7 @@ end subroutine RECT_DISP0
    SUBROUTINE OCEAN_CORRECTION  (observer, CORR, D_CORR)   !
 ! +--------------------------------------------------------+
 !
-use COMMON; implicit NONE   
+use COMMON; use TRIGFCN; implicit NONE   
 !
 !  # This routine computes the correction to the fields already
 !    computed via AXIS_DISP0 or RECT_DISP0 for the load distributed
@@ -15723,13 +15799,13 @@ ENDIF
 !
 !
 IF(ne==30600) then
-If (IR==0.and.dIR==0.and.it==0.and.dit==0.  &
-                            and.IG==0.and.dIG==0.and.iv==0) then 
+If (IR==0.and.dIR==0.and.it==0.and.dit==0  &
+                            .and.IG==0.and.dIG==0.and.iv==0) then 
 Write(99,*) 'ERROR IN SBR. TASK_3: At least one of the switches IR, DIR, etc. must '
 Write(99,*) 'be =1 in order to perform an Local_Study. **** JOB ABORTED ********** ';stop
 Endif          
-If (IR==0.and.dIR==0.and.it==0.and.dit==0.  &
-                            and.IG==0.and.dIG==0.and.iv==1) then 
+If (IR==0.and.dIR==0.and.it==0.and.dit==0  &
+                            .and.IG==0.and.dIG==0.and.iv==1) then 
 Write(99,*) 'ERROR IN SBR. TASK_3: At least one of the switches IR, DIR, etc. must '
 Write(99,*) 'be =1 in order to perform an Local_Study. **** JOB ABORTED ********** '
 Write(* ,*) 'ERROR IN SBR. TASK_3: At least one of the switches IR, DIR, etc. must '
@@ -17089,13 +17165,13 @@ endif
 !
 !
 IF(ne==20480) THEN
-If (IR==0.and.dIR==0.and.it==0.and.dit==0.  &
-                            and.IG==0.and.dIG==0.and.iv==0) then 
+If (IR==0.and.dIR==0.and.it==0.and.dit==0  &
+                            .and.IG==0.and.dIG==0.and.iv==0) then 
 Write(99,*) 'ERROR IN SBR. TASK_2: At least one of the switches IR, DIR, etc. must '
 Write(99,*) 'be =1 in order to perform an Local_Study. **** JOB ABORTED ********** ';stop
 Endif          
-If (IR==0.and.dIR==0.and.it==0.and.dit==0.  &
-                            and.IG==0.and.dIG==0.and.iv==1) then 
+If (IR==0.and.dIR==0.and.it==0.and.dit==0  &
+                            .and.IG==0.and.dIG==0.and.iv==1) then 
 Write(99,*) 'ERROR IN SBR. TASK_2: At least one of the switches IR, DIR, etc. must '
 Write(99,*) 'be =1 in order to perform an Local_Study. **** JOB ABORTED ********** '
 Write(* ,*) 'ERROR IN SBR. TASK_2: At least one of the switches IR, DIR, etc. must '
