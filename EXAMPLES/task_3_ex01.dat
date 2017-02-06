@@ -1,0 +1,597 @@
+Active
+!
+! *****************************************************
+! * This is file "task_3.dat" : Complex Glacial Loads *
+! *****************************************************
+!
+!
+!
+!
+!
+!
+!
+!
+!           
+!
+! +--------------------------------+
+! | Basic configuration of Task#3  |
+! +--------------------------------+
+! 
+! In order to allow TABOO to execute Task#3 it is necessary
+! to input some basic information. This is done here by means of the
+! kw Harmonic_Degrees. The User must supply the following records: 
+!
+Harmonic_Degrees
+    2 128        ! min and max harmonic degrees 
+        1        ! verbose mode (1->verbose, 0->silent) 
+        0        ! only_elastic (0/1) if=1, a purely elastic analysis is requested 
+        1        ! drop_modes (0/1) if=1, 'bad' modes are excluded from the computations  
+!
+!
+!
+!
+!
+! +-------------------------------------------------------+
+! | Definition of the radial structure of the Earth model |
+! +-------------------------------------------------------+
+!
+! At the time of this writing, the user can choose one of
+! following models, where NV is the number of viscoelastic
+! layers and CODE allows to select a specific density and
+! rigidity profile, which is normally taken from the literature.
+! LT is the thickness of the elastic lithosphere, in km.
+! See APPENDIX A1 of the User Guide for further details.
+!
+!
+! NV=1  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=1  CODE=1 ---> Yuen Sabadini Boschi [1982], LT= 100 km.
+! NV=1  CODE=2 ---> Ondrej Cadek, LT= 70 km.
+! NV=1  CODE=3 ---> Ondrej Cadek, LT= 200 km.
+! NV=1  CODE=4 ---> Giunchi & Spada [2000] BUT self-g., 30 <= LT <= 300 km
+!
+! NV=2  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=2  CODE=1 ---> Averaged PREM, BUT d(rho)/rho at 670 from PREM, 30 <= LT <= 300 km.
+! NV=2  CODE=2 ---> Yuen Sabadini Boschi [1982], LT= 100 km.
+! NV=2  CODE=3 ---> Bills & James [1997], LT= 100 km.
+! NV=2  CODE=4 ---> Lefftz Sabadini Legros  [1994], LT= 150 km.
+! NV=2  CODE=5 ---> Piersanti Postseismic, LT= 80 km.
+! NV=2  CODE=6 ---> Ricard Sabadini Spada [1992], Model h, LT= 100 km.
+!
+! NV=3  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=3  CODE=1 ---> NOT Averaged Prem, 30 <= LT <= 300 km., see Sbr. SPEC for details
+! NV=3  CODE=2 ---> Cianetti Giunchi Spada [2002], LT=  120 km.
+! NV=3  CODE=3 ---> James & Morgan [1990] GRL (table #1), LT= 120 Km.
+! NV=3  CODE=4 ---> Similar to W. R. Peltier [1985], LT=  120 km.
+! NV=3  CODE=5 ---> Paul Johnston [benchmark, 1997], LT= 70 km.
+!
+! NV=4  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km.
+! NV=4  CODE=1 ---> Averaged PREM, LM not averaged in Rho, 40 <= LT <= 150 km.
+! NV=4  CODE=2 ---> Averaged Prem, LM not averaged in Rho nor Mu, 40 <= LT <= 150 km.
+!
+! NV=7  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km. 3 SM layers, 4 LM layers.
+!
+! NV=9  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km. 3 SM layers, 4 LM layers.
+!
+!
+! Please provide the following (see also the User guide):
+!
+Make_Model
+           1   ! Number of Visco- Elastic layers (1,2,3,4,7,9, o 10)
+           1   ! Choose a specific density and rigidity profile from the above list.    
+       100.0   ! Thickness of the elastic lithosphere (ignored for certain CODE values!)
+           0   ! Controls the thickness of the LM layers for NV=7 and 9. Otherwise ignored.
+         1.0   ! Viscosity of the bottom ve layer, in units of 10**21 Pa.s
+!
+!
+!  The keyword External_Model Reads the modes from the external file external.dat
+!  and supersedes any choice made above regarding the model to be employed. 
+!  If External_Model is active, Make_Model must be inactive. See the User Guide.
+!
+!External_Model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!                  +====================+
+! Option "1" --->  | "AD HOC" ICE LOAD  |
+!                  +====================+
+!
+!
+! To model an 'Ad Hoc' complex ice aggregate, you must configure the
+! Ad_Hoc keyword as follows:
+!
+!
+! +<---- Column #1
+! |
+!
+! Ad_Hoc            <--- Case-sensitive TABOO kw
+! Filename         <--- User- supplied file
+!
+!
+!
+! The records of Filename have the following structure:
+!                
+! N              <- Number of elements forming the complex load
+! C_L IOC L_H  <- Load type, Ocean switch & Time-History type <-----+
+! s_1 s_2 ... <- Geometrical attributes of the load                 |       Block
+! PAR         <- Maximum Thickness (m), or mass (kg)                | to be repeated for
+! p_1  p_2 ...    <- Temporal attributes                             |    each of the N
+! f_0  f_1  f_2  ... <- Other attributes                            |      elements
+! g_0  g_1  g_2  ... <- Other attribures              <-------------+
+!
+!  
+! 	The meaning of these parameters is explained in the following, but
+! see also the User Guide for more details!
+!
+!
+!                       *** Parameter C_L (load type) ***
+!
+!
+!                       | s_1 = Longitude of the load center  (deg)
+!  If C_L = 10 or 11 -> | s_2 = Co-latitude of the load center  (")
+!  =================    | s_3 = Half- amplitude of the disc    (")
+!                       | PAR = Max. thickness of the (primary)
+!                               disc load (m)
+!
+!
+!                       | s_1 = Longitude of the load center  (deg)
+!  If C_L = 20 or 21 -> | s_2 = Co-latitude of the load center  (")
+!  =================    | s_3 = Half- amplitude of the disc   (")
+!                       | PAR = Max. thickness at the centre of
+!                               the (primary) load (m)
+!
+!
+!
+!                       | s_1 = Longitudine of the load (deg)
+!     If C_L = 30 ----> | s_2 = Co-latitude of the load (")
+!     ===========       | PAR = Max. mass of the point load (kg)
+!
+!
+!
+!                       | s_1 = Longitude of the load centroid (deg)
+!		        | s_2 = Co-latitude of the load centroid  (")
+!     If C_L = 30 ----> | s_3 = Load width in longitude   (")
+!     ===========       | s_4 = Load width in congitude  (")
+!                       | PAR = Max. thickness of the load (m)
+!
+!
+!
+!                       *** Parameter L_h (history type) ***
+!
+!
+!
+!   If L_h = 0 -->  | p_1 = Time Since Loading (kyr)
+!   ++++++++++
+!
+!
+!   If L_h = 1 -->  | p_1 = Time Since Un-loading (kyr)
+!   ++++++++++
+!
+!
+!   If L_h = 2 -->  | p_1 = Time Since Un-loading (kyr)
+!   ++++++++++      | p_2 = Lapse of time between loading & un-loading (kyrs)
+!
+!
+!
+!   If L_h = 3 -->  | p_1 = Time Since the Beginning of Deglaciation (kyrs)
+!   ++++++++++      | p_2 = Duration of the phase of deglaciation ( " )
+!
+!
+!
+!                   | p_1 = Time Since the Beginning of the Last Deglaciation (kyrs)
+!   If L_h = 4 -->  | p_2 = Duration of the loading phase ( " )
+!   ++++++++++      | p_3 = Duration of the un- loading phase ( " )
+!                   | p_4 = Number of (loading+unloading) phases
+!                           in addition to the last (INTEGER)
+!
+!
+!
+!   If L_h = 5 -->  | p_1 = Time since time t=0 (kyrs)
+!   ++++++++++      | p_2 = Period of the sinusoid (kyrs)
+!
+!
+!
+!                   | p_1 = Time since the Beginning of the
+!                           Piecewise Linear Phase (PLP) (kyr)
+!   If L_h = 6 -->  | p_2 = NNS = Number of intervals characterizing the PLP (INTEGER)
+!   ++++++++++      | f_k = time t_k (t_0 = 0.0 kyrs by convention) (k=0,...,NNS)
+!                   | g_k = load thickness (m) (or mass, kg) at time t_k (  "  )
+!                           i)  the PAR parameter will be superseded by MAX(g_k)
+!                           ii) give the f_k's and the g_k's in one row!
+!
+!
+!
+!                   | p_1 = Time since the Beginning of the
+!                           Piecewise Constant Phase (PCP) (kyr)
+!   If L_h = 7 -->  | p_2 = Duration of each time step during the PCP ( " )
+!   ++++++++++      | p_3 = NS = Number of steps during the PCP ( " )
+!                   | f_k = Load thickness (m) (or mass, kg) at step #k (k=0,...,NS)
+!                           i)    By convention, f_0 refers to the period before the PCP
+!                                 (also called step#0)
+!                           ii)   By convention, after the PCP (step#NS+1): f_(NS+1)=f_NS
+!                           iii)  The PAR parameter will be superseded by MAX(f_k)
+!                           iv)   Give the f_k's in one row!
+!
+!
+!
+!
+!                   | p_1 = Time since the Beginning of the
+!                           Piecewise Constant Phase (PCP) (kyr)
+!   If L_h = 8 -->  | p_2 = Duration of each time step during the PCP ( " )
+!   ++++++++++      | p_3 = NS = Number of steps during the PCP  ( " )
+!                   | p_4 = Length of the loading phase prior to the PCP
+!                   | f_k = Load thickness (m) (or mass, kg) at step #k (k=0,...,NS)
+!                           i)   By convention, f_0 refers to the period before the PCP
+!                                (also called step#0)
+!                           ii)  By convention, after the PCP (step#NS+1): f_(NS+1)=f_NS
+!                           iii) The PAR parameter will be superseded by MAX(f_k)
+!                           iv)  Give the g_k's in one row!
+!
+!
+Ad_Hoc
+complex_e31.dat
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!                  +================================+
+! Option "2" --->  | A PREEXISTING COMPLEX ICE LOAD |
+!                  +================================+
+!
+!
+!	In TABOO, there is the possibility of dealing with the complex
+! ice loads of the type ICE*, developed by W. R. Peltier and
+! co-authors. To date, we have implemented ICE1, ICE2, and ICE3G.
+! In all of these glacial models, the time-history is of the kind
+! l_h = 7 (see the User guide), and the PCP (Piecewise Constant Phase)
+! is 18 kyrs long. The beginning of the PCP is placed at 18 kyrs BP.
+! Furthermore, it is assumed that before the deglaciation, the Earth
+! is in a state of isostatic equilibrium.
+!	The User can change the native features of ICE* by introducing a
+! finite loading phase before the beginning of deglaciation (from l_h=7
+! to l_h=8), or substituting the rectangular elements (c_l=50) of ICE1
+! and ICE2 with discs (C_L=10). It is also possible to impose mass
+! conservation assuming that the melt water is discharged uniformly on
+! oceans of realistic shape, or to deal with sub-aggregates of the
+! deglaciation models separately.
+!
+!	You must supply the following records:
+!
+!
+! +-------------- First column
+! |
+! | 
+! ^   
+! Keyword             <--- kw = Ice_1, Ice_2 or Ice_3
+! IOC              <--- (0/1) Ocean switch
+! FRTD          <--- (0/1) Conversion from c_l=50 to c_l=10 (only for Ice_1 & Ice_2)
+! F7T8 tau   <--- (0/1) Conversion from L_h=7 to l_h=8 & length of loading phase (kyrs)
+! Scale        <--- Scales the thickness of the ice elements by SCALE
+! KS             <--- Number of sub-aggregates of kw to be included
+! sub_1   <--------+
+! sub_2 	   | 
+!  . 	           |
+!  .  		   | sub_k = k-th sub-aggregates of I_* (k=1,..,KS)
+!  .               | 
+! sub_KS  <--------+
+! |
+! |
+! +--------- First column
+!
+!
+!
+!
+!
+!
+!
+!
+!e.g.
+!Ice_1
+!        0
+!     0
+!      1 100.
+!   1.0
+!            1
+!ice1.dat 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! +----------------------------------+
+! |   Choice of the LOCAL Analysis   |
+! +----------------------------------+
+!
+!
+!	This section allows to configure the KW Local_Study. The
+!  parameters of this kw describe the spatial and temporal features
+!  of the analysis to be performed.
+!	Concerning the temporal parameters of this keyword, we will
+!  adopt this convention: POSITIVE time values denote times BEFORE
+!  PRESENT (BP), whereas NEGATIVE time values are FUTURE times.
+!       At present, Local_Study can be configured in six
+!  different manners.
+!
+!
+!
+! ----------------------------------------------------------+
+! Local analysis of Type#1: One observer, and various times |
+! ----------------------------------------------------------+
+!
+!	In this analysis the fields are computed at a given point (observer)
+! of longitude LON and colatitude COL, for times between T1 kyrs BP and T2
+! kyrs BP (where T2 >= T1) with increments equal to DTI (> 0) kyrs.
+!
+!	The user must supply the following records:
+!
+!
+! Local_Study             <---  kw
+! 1                            <---  Label for the type of analysis
+! IR, IT, IG, DIR, DIT, DIG     <---   Switches (0/1) to select the fields
+! LON COL                        <---   Coordinates of the observer
+! T1 T2 DTI                       <---    T1, T2, and DTI (kyrs)
+!
+!e.g.
+! Local_Study
+! 1
+!  1 1 1 1 1 1    
+!     12.2 45.8      270.0 30.0
+!  0.0   0.0 0.1 
+!
+!
+!
+!
+!
+!
+!
+! ------------------------------------------------------------+
+! Local analysis of Type#2: More observers, and various times |
+! ------------------------------------------------------------+
+!
+!	In this analysis the fields are computed on a set of points provided
+! by an user supplied file. Each row of this file, written in free format,
+! contains LONG_k, COLA_k (k=1, ...,N), where LONG_k and  COLA_k are the
+! coordinates of the k-th observer in DEGREES. The maximum number of
+! observers is N=12000. The time ranges between T1 kyrs BP and T2 kyrs
+! BP (T1<T2), with increments of DTI (>0) kyrs (this interval is the same
+! for all the observers).
+! 
+!	The user must supply the following records:
+!
+! 
+! Local_Study                   <--- Keyword
+! 2                              <--- Labels this type of analysis
+! IR, IT, IG, DIR, DIT, DIG    <--- Switches (0/1) to select the fields
+! Filename                  <---  user-supplied filename (max 30 characters)
+! T1 T2 DTI               <---  TMIN, TMAX, and DELTAT (kyrs)
+!
+!e.g.  
+!Local_Study
+! 2
+!   1 1 0   0 0 0  
+!sprs.dat 
+!   18.0  18.0 1.0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! ----------------------------------------------------+
+! Local analysis of Type#3: On a map, at a given time |
+! ----------------------------------------------------+
+!
+!	In this analysis, the fields are computed on a regular grid of
+! points on the Earth surface. On the grid points the longitude
+! and the colatitude vary in the ranges [L1:L2] and [C1:C2] degrees, 
+! respectively. The increments are EPL degrees in longitude  and EPC 
+! degrees in colatitude. The fields are computed at the time GIVEN_TIME 
+! (in units of kyrs, as usual). 
+!
+!	The user must supply the following records:
+!
+! Local_Study           <--- Keyword  
+! 3                          <--- Label for this type of analysis
+! IR, IT, IG, DIR, DIT, DIG   <--- Switches (0/1) to select the fields   
+! L1 L2 EPL                  <--- Bounds in longitude & increment (deg)      
+! C1 C2 EPC                 <--- Bounds in colatitude  & increment (deg)   		         
+! GIVEN_TIME               <---  Time (kyr)
+! I_THI                   <--- Switch for the ice thickness map (0/1) 
+!
+!
+!e.g.
+! Local_Study
+!  3
+!   0 0 0 1 1 0 
+!    0.0 355.0 5.0
+!        5.0 175.0 5.0
+!    0.0
+!   0
+!	  
+!
+!	  
+!
+!
+!
+!
+! ----------------------------------------------------------+
+! Local analysis of Type#4: Baselines rates at a given time |
+! ----------------------------------------------------------+
+!
+!       This analysis concerns the rates of deformation of the
+! baseline connecting two sites on the Earth surface. The rates
+! are projected along the conventional VLBI components L, T, and V.
+! The User is referred to the Theory section of the TABOO User
+! guide for details on how to compute the L, T, and V rates.
+! The User must supply some paramaters and a file containing
+! information on the couples of sites connected by each baseline.
+! It may be of one of two formats:
+!
+!
+!                            Form #1
+!                            -------
+!
+! 	If code '1' is found in the first line of the file, the
+! lines which follow contain the names of the two sites of the couple, in
+! the form:
+!
+! 	site#1  site#2
+!
+! 	where site#1 and site#2 are names of the two sites. They must
+! be given as two CHARACTER*8 constants aligned left and separated by
+! two blank characters (the format is '(a8,2x,a8)'). A maximum of 100
+! couples of sites can be given, the extra couples will be simply ignored.
+! The names of the sites (e.g.,  ALGOPARK, RICHMOND, BREST...) are
+! listed in the file site_locations.2001cn.1 which has been downloaded
+! from the web site of the Goddard Geodetic VLBI Group
+! (http://lupus.gsfc.nasa.gov/vlbi.html). This file is contained in the
+! archive taboo.zip. TABOO reads the two CHARACTER*8 constants, copies
+! from the NASA file the coordinates of the two sites, and performs
+! a transformation from the original DMS to the decimal form. These
+! coordinats are used to compute the L, T, and V components of the
+! velocity of site#2 w.r.t. site#1 at the time GIVEN_TIME provided by
+! the user (see below).
+!
+!
+!
+!                            Form #2
+!                            -------
+!
+!       If the code '2' is found in the first row of the user-
+! supplied file, the rows which follow contain the coordinates
+! expressed in degrees (decimal form). The coordinates are
+! LONG_1, COLA_1, LONG_2, COLA_2, where 1 and 2 refer to the
+! sites, and LONG and COLA stand for longitude and colatitude,
+! respectively (these ccordinates of course need not to be those
+! of a real VLBI or GPS site). The coordinates, which can be given
+! in free format, are used to compute the L, T, and V components of
+! the velocity of site#2 w.r.t. site#1 at the time GIVEN_TIME provided
+! by the user (see below). A maximum of 100 couples of sites can be
+! given, the extra couples will be simply ignored.
+!
+!	The user must supply the following records:
+!
+!
+! Local_Study   <---  TABOO Keyword
+! 4               <--- Label for this type of analysis
+! Filename      <--- User-supplied file (see above, MAX 30 characters!)
+! GIVEN_TIME     <---  Time BP (kyr)
+!
+!e.g.
+!    Local_Study
+!    4
+!nomi_siti.dat                               vlbi_sites.dat
+!    0.0
+!
+!
+!
+!
+! <<<<<< LOCAL_STUDY CONFIGURATION >>>>>>
+!
+Local_Study
+ 3              ! On a map, at a given time
+ 1 1 1 1 1 1    ! Switches (0/1) to select the fields   
+ 1.0 359.0 2.0  ! Bounds in longitude & increment (deg)      
+ 1.0 179.0 2.0  ! Bounds in colatitude  & increment (deg)   		         
+ 0.0            ! Time (kyr)
+ 0              ! Switch for the ice thickness map (0/1) 
+!
+!
+!
+!
+!
+!
+! +-----------------------------------+
+! |   Choice of the GLOBAL Analysis   |
+! +-----------------------------------+
+!
+!
+!	This section allows to configure the KW Global_Study, whose
+!  parameters describe the features of the study to be performed.
+!	Concerning the temporal parameters of this kw, we will adopt
+!  the same convention as for Local_Study: POSITIVE time values
+!  denote times BEFORE PRESENT (BP), whereas NEGATIVE time values are
+!  FUTURE times.
+!       At present, Global_Study can be configured in two manners.
+!
+!
+!
+! --------------------------------------------------------+
+! Global analysis of Type#1: Stokes coefficients vs time  | 
+! --------------------------------------------------------+
+!
+!	This analysis allows to compute the variations of the Stokes
+! coefficients of degree L and order M and their time derivatives 
+! as a function of time.  The time range is [T1:T2] kyrs BP, and the
+! time increment is DTI kyrs.
+!
+!  
+! Global_Study      <--- Keyword
+! 1  		     <--- Label for this type of analysis
+! L M              <--- Degree [2:36] & order of the Stokes coefficient
+! Inorm             <--- (0/1) If = 1, the coefficients will be fully normalized
+!
+!  
+!
+!e.g.
+! Global_Study
+! 1
+! 5 0 
+!   0
+!   -8.0 -1.055 3.10
+!
+!
+!
+!
+!
+!
+!
+! ---------------------------------------------------+
+! Global analysis of Type#2: Inertia tensor vs time  |
+! ---------------------------------------------------+
+!
+! 	This analysis allows to compute the variations of the Inertia
+! tensor and their time derivatives as a function of time.  The time
+! range is [T1:T2] kyrs, and the time increment is DTI (>0) kyrs.
+!
+!
+! Global_Study     <--- Keyword  
+! 2                   <--- Label for this type of analysis
+! T1 T2 DTI    <---  T1, T2, and  DTI (kyrs)
+!  
+!
+!e.g.
+! Global_Study
+! 2
+!  -20.0 13.0 1.10
+!
+!
+!
+!
+!
+!
+! ****************************
+! * End of file "task_3.dat" *
+! ****************************
