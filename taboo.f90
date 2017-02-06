@@ -354,7 +354,7 @@ END MODULE COMMON_FOR_SPECTRUM
  REAL(DP) :: MICE             ! Mass of the load as a function of time 
 !
 !   _These are useful to compute the elapsed time_
- Real(sp) :: etime, txt(2), ela1, ela2; EXTERNAL ETIME 
+ Real(sp) :: txt(2), ela1, ela2   ! It was: Real(sp) :: etime, txt(2), ela1, ela2; EXTERNAL ETIME 
 !
 !        _Coordinates of the Observers_
     integer (i4b), parameter :: nobs_max=16200 ! Maximum accepted observers number
@@ -525,8 +525,7 @@ module FOR_TASK3
   Real(dp) ::     D_Ine(3,3) ! Time-derivative of Ine(:,:) 
 !
 ! _cpu time tools_
-  REAL(sp) :: txt(2), etime
-  EXTERNAL ETIME 
+  REAL(sp) :: txt(2)       ! It was: REAL(sp) :: txt(2), etime; EXTERNAL ETIME 
   REAL(sp) :: ela4, ela1, ela0
 !
 ! _observers coordinates_
@@ -3044,7 +3043,7 @@ if(iv==1) Write(* ,*) 'Expanding the loads in spherical harmonics ...'
 	    DO 222 K=1, NOBS
 !           ++++++++++++++++
 !
-            ela0=etime(txt)
+            call etime(txt,ela0)       ! It was: ela0=etime(txt)
 !
                OBS(1) = LONG_OBS(K)
 	       OBS(2) = COLA_OBS(K)
@@ -3058,7 +3057,7 @@ if(iv==1) Write(* ,*) 'Expanding the loads in spherical harmonics ...'
                OPEN(31,file='coeff.tmp',status='UNKNOWN',form='unformatted')
 !
 !
-                  ela1=ETIME(txt)
+                  call etime(txt,ela1)     ! It was: ela1=ETIME(txt)
 !
                   mice = 0.D0
 !
@@ -3117,7 +3116,7 @@ if(iv==1) Write(* ,*) 'Expanding the loads in spherical harmonics ...'
  111 CONTINUE   ! Enddo on time
 !-------------
 
-  ela4=etime(txt)
+  call etime(txt,ela4)      ! It was: ela4=etime(txt)
 !
             WRITE(99,*) 'Time elapsed for an observer (s) =', ela4-ela0
 !
@@ -3193,7 +3192,7 @@ IF(i_thi==1) OPEN(56,file='load_thick.dat',status='unknown')
      DO 2227 K=1, NOBS
 !========================
 !
-        ela0=etime(txt)
+        call etime(txt,ela0)    ! It was: ela0=etime(txt)
 !
          OBS(1) = LONG_OBS(K)
          OBS(2) = COLA_OBS(K)
@@ -3262,7 +3261,7 @@ IF(i_thi==1) OPEN(56,file='load_thick.dat',status='unknown')
  Close(31) 
 !
 !
- Ela4=Etime(txt)
+ call etime(txt,ela4)     ! It was: Ela4=Etime(txt)
 !
 !
  Write(99 ,'(a26,i5,a2,i6,a1,f14.5,a1)') &
@@ -3315,7 +3314,7 @@ IF(iv==1)  WRITE(* ,*) 'Local analysis of type #4 (baselines) please WAIT ...'
 !
          OPEN(31,file='coeff.tmp',status='UNKNOWN',form='unformatted')
 !
-         ela0=etime(txt)
+         call etime(txt,ela0)    ! It was: ela0=etime(txt)
 !
          OBS_1 (1) = LONG_Site_1 (K); OBS_1 (2) = COLA_Site_1 (K)
          OBS_2 (1) = LONG_Site_2 (K); OBS_2 (2) = COLA_Site_2 (K)
@@ -3385,7 +3384,7 @@ ENDIF
  CLOSE(31)
 !
 !
- Ela4=Etime(txt)
+ call etime(txt,ela4)      ! It was: Ela4=Etime(txt)
  WRITE (99,'(a30,i5,a3,i6,a1,f14.5,a1)') &
             'Elapsed time for the couple #', k,' of', nobs,'=',ela4-ela0,'s'
 !
@@ -3474,7 +3473,7 @@ IF(iv==1)  WRITE(* ,*) 'Global analysis of type #1 (Stokes) ...'
 	Do 131 TIME_BP = T1, T2, DTI
 !       +==========================+
 !
-        Ela0 = Etime(txt)
+        call etime(txt,ela0)     ! It was: Ela0 = Etime(txt)
 !
         MICE  = 0.D0
 !
@@ -3518,7 +3517,7 @@ IF(iv==1)  WRITE(* ,*) 'Global analysis of type #1 (Stokes) ...'
 !+...............+
 !
 !
-   Ela4 = Etime(txt)
+   call etime(txt,ela4)      ! It was: Ela4 = Etime(txt)
 !
    Fact1= 1D6
    Fact2= 1D11
@@ -3627,7 +3626,7 @@ IF(iv==1)  WRITE(* ,*) 'Global analysis of type #1 (Stokes) ...'
 	Do 141 TIME_BP = T1, T2, DTI
 !-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
 !
-        Ela0 = Etime(txt)
+        call etime(txt,ela0)     ! It was: Ela0 = Etime(txt)
 !
         MICE = 0.D0 
 !
