@@ -1,0 +1,62 @@
+ # 2017.02.06 time=14.34.37
+ Detecting the Active INPUT file !
+ task_1.dat is NOT active 
+ task_2.dat is active 
+ task_3.dat is NOT active 
+ Opening file task_2.dat ...  
+ Reading file task_2.dat ...  
+ > found KEYWORD  Harmonic_Degrees              
+ Lmin and Lmax            2          72
+ ONLY Elastic fields
+ The 'non physical' modes will NOT be killed
+ > found KEYWORD  Make_Model                    
+ Building the model 
+ Number of VE layers                 1
+ Model CODE is                       0
+ From input, the lithospheric thickness is      80.0000  km
+ The ILM parameter (for NV=7 and 9) is set to     0
+ Mantle viscosity from BOTTOM to TOP (/1E21) 
+ Viscosity of layer   1 =    1.0000
+ ---------------------------------------------------------------
+  Radii, densities, shear moduli & viscosity from bottom to top 
+         SI units: m, kg/m**3, Pa, Pa.s, respectively           
+ ---------------------------------------------------------------
+   0   0.34800000E+07  0.10931731E+05  0.00000000E+00  0.00000000E+00
+   1   0.62910000E+07  0.44887251E+04  0.17868397E+12  0.10000000E+22
+   2   0.63710000E+07  0.31146547E+04  0.56286599E+11  0.00000000E+00
+ Lithospheric thickness effectively employed (km) =     80.0000
+ Looking for density inversions...
+ No density inversions found
+ -----------------------------------
+  Gravity at the interfaces (m/s/s) 
+        (from bottom to top)        
+ -----------------------------------
+   0  0.10628760E+02
+   1  0.98065474E+01
+   2  0.97680530E+01
+ Writing the elastic h ldc on h.dat 
+ Writing the elastic l ldc on l.dat 
+ Writing the elastic k ldc on k.dat 
+ Done with the computation of the Spectral quantities 
+ Looking now for KWs Load_Geometry and Load_History
+ > found KEYWORD  Load_Geometry                 
+ Reading the load geometry
+ Rectangular load (CL=50)
+ Longitude  of the centroid (deg) =   95.000000000000000     
+ Colatitude of the centroid (deg) =   30.000000000000000     
+ Amplitude in longitude  (deg) =   70.000000000000000     
+ Amplitude in colatitude (deg) =   20.000000000000000     
+ The load is NOT compensated on a realistic ocean
+ > found KEYWORD  Load_History                  
+ Reading the load time-history 
+ Time-history #0: Instantaneous loading at t=0 kyrs
+ Done with Load_Geometry and Load_History
+ Looking now for KWs Local_Study or Global_Study
+ > found KEYWORD  Global_Study                  
+ Global Study of Type#2
+ task_2.dat is being closed... done 
+ The KWs Local_Study (Global_Study) are been configured correctly
+ Writing the harmonic components of the load on file load_coeff.dat
+ The Maximum Load MASS is    1.7222287841068314E+017 kg
+ Computing for Global Study of Type#2
+ # Closing this file (taboo.log) on2017.02.06 time=14.34.37
