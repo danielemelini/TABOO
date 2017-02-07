@@ -21,8 +21,13 @@
 !   +------------------------------------------------------+
 !                         
 !
-! v1.1 - DM, February 2017
+! v1.1 - DM, February 6, 2017
 !        Ported to GNU gfortran and added two NV=3 models
+!      - DM, February 7, 2017
+!        Now TABOO computes the 'true' Earth and density for
+!        M3-L70-V01. Adjusted the precision of PI values and
+!        of the gravitational constant. Adjusted ice density to
+!        931 kg/m**3 [r11]
 !
  module STRATA 
 ! defines the kinds an PI 
@@ -122,10 +127,13 @@ use STRATA
 implicit none 
 save 
 !
- real(dp), parameter :: raggio   = 6.371D6     ! Earth radius (m)
- real(dp), parameter :: emass    = 5.97D24     ! Earth mass (kg)
- real(dp), parameter :: rhoea    = 5.51157D3   ! Average density (kg/m3)
- real(dp), parameter :: rhoice   = 1.D3        ! Ice density (kg/m3)
+ real(dp), parameter :: raggio    = 6.371D6    ! Earth radius (m)
+ real(dp), parameter :: ref_emass = 5.97D24    ! Reference Earth mass (kg)
+ real(dp), parameter :: ref_rhoea = 5.51157D3  ! Reference average density (kg/m3)
+ real(dp), parameter :: rhoice    = 931.D0     ! Ice density (kg/m3)
+!
+ real(dp) :: emass                             ! Earth mass (kg)
+ real(dp) :: rhoea                             ! Ice density (kg/m3)
 !
 integer(i4b), parameter :: nv_max     =  24  ! maximum allowed number of v.e. layers 
 integer(i4b), parameter :: nroots_max =  96  ! maximum allowed number of modes  
@@ -9256,7 +9264,7 @@ real (qp), parameter :: haskell = 1.q21   ! HASKELL unit
 !
 !
 !
-    ggg =0.667q-10    ! Newton constant
+    ggg =0.66732q-10    ! Newton constant
 !
 !
 !
@@ -11936,7 +11944,7 @@ function th_5 (t)
 !
  REAL(sp) :: t       ! local time
 !
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
 !+----------------------------------+
 ! Definition of the Th#5:  (periodic)
@@ -11974,7 +11982,7 @@ subroutine Convol_5_new (t)
  REAL(sp) :: AUX        ! Auxilium
  REAL(sp) :: f5, d_f5   ! time-history and its derivative
  REAL(sp) :: omega      ! 'frequency' = 2*pi/period
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
  INTEGER (i4b) :: m  ! Modes index
  INTEGER (i4b) :: L  ! Harmonic Degree
@@ -12071,7 +12079,7 @@ function th_6 (t)
 !
  REAL(sp) :: t       ! local time
 !
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
  INTEGER(i4b) :: k   ! index
 !
@@ -12131,7 +12139,7 @@ subroutine Convol_6_new (t)
  REAL(sp) :: t          ! << local time >> variable
  REAL(sp) :: AUX        ! Auxilium
  REAL(sp) :: f6, d_f6   ! time-history and its derivative
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
  INTEGER (i4b) :: m  ! Modes index
  INTEGER (i4b) :: L  ! Harmonic Degree
@@ -12244,7 +12252,7 @@ function th_7 (t)
 !
  REAL(sp) :: t       ! local time
 !
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
  INTEGER(i4b) :: k   ! index
 !
@@ -12294,7 +12302,7 @@ subroutine Convol_7_new (t)
  REAL(sp) :: t          ! << local time >> variable
  REAL(sp) :: AUX        ! Auxilium
  REAL(sp) :: f7, d_f7   ! time-history and its derivative
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
  INTEGER (i4b) :: m  ! Modes index
  INTEGER (i4b) :: L  ! Harmonic Degree
@@ -12405,7 +12413,7 @@ function th_8 (t)
 !
  REAL(sp) :: t         ! local time
 !
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
  REAL(sp) :: AUX, daux ! auxilia
 !
  INTEGER(i4b) :: k     ! index
@@ -12464,7 +12472,7 @@ subroutine Convol_8_new (t)
  REAL(sp) :: AUX        ! Auxilium
  REAL(sp) :: f8, d_f8   ! time-history and its derivative
  REAL(sp) :: f7, d_f7   ! also these are needed
- real(sp), parameter :: pig    = 3.141592653589
+ real(sp), parameter :: pig    = 3.1415926535897932384
 !
  INTEGER (i4b) :: m  ! Modes index
  INTEGER (i4b) :: L  ! Harmonic Degree
@@ -14525,6 +14533,40 @@ Enddo
 !
 IF(idens==0)             WRITE(99,*) 'No density inversions found'
 IF(idens==0 .and. iv==1) WRITE(* ,*) 'No density inversions found'
+!
+!
+!
+!  +--------------------------------+
+!  | Earth mass and average density |
+!  +-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-+
+!
+IF((NV==3).AND.(CODE==7)) THEN
+!
+    emass = 4._qp * pi * rho (0) * r (0) **3 / 3._qp  
+    do k = 1, nv+1  
+        emass = emass + (4._qp / 3._qp) * pi * (r (k) **3 - r (k - 1) **3) * rho (k)
+    enddo  
+    rhoea = emass/(4._qp/3._qp)/pi/r(nv+1)/r(nv+1)/r(nv+1)
+!
+    Write(99,*) 'Using true values for the Earth mass and average density'
+    Write(99,*) 'Effective mass of the model (kg)'
+    Write(99,'(d14.8)'), emass
+!
+    Write(99,*) 'Average density of the model (kg/m^3)'
+    Write(99,'(d14.8)'), rhoea
+!
+ELSE
+    emass = ref_emass
+    rhoea = ref_rhoea
+!
+    Write(99,*) 'Using reference values for the Earth mass and average density'
+    Write(99,*) 'Mass of the model (kg)'
+    Write(99,'(d14.8)'), emass
+!
+    Write(99,*) 'Average density of the model (kg/m^3)'
+    Write(99,'(d14.8)'), rhoea
+!
+ENDIF
 !
 !
 !
