@@ -7221,7 +7221,13 @@ If(IG==1) CLOSE(51);  If(dIG==1) CLOSE(55)
 ! the oceanic load when real continent bounaries are employed.
 !
 !
+! # Fixed 'special case 5' (observer and load at the antipodes)
+!   (DM Feb 20, 2017)
+!
  use COMMON; use TRIGFCN; implicit NONE   
+!
+ real(dp) :: cos_delta
+ real(dp), parameter :: eps = 1.D-200    ! Tolerance for antipode check
 !
  real(dp) :: VECT(4), D_VECT(4) ! Solution vectors
  real(DP) :: CORR(4), D_CORR(4) ! Their time-derivatives
@@ -7410,10 +7416,16 @@ du_teta = 0._dp ; du_long = 0._dp
 !
 ! _Load not at the pole, observer at its antipodes_
 !
-log_1 = abs(long_cen - long_obs) == 180._dp 
-log_2 =     teta_cen + teta_obs  == 180._dp
+!log_1 = abs(long_cen - long_obs) == 180._dp 
+!log_2 =     teta_cen + teta_obs  == 180._dp
 !
-if( log_1 .or. log_2 ) then  
+!if( log_1 .or. log_2 ) then  
+!
+cos_delta = cosd(teta_obs)*cosd(teta_cen) + 			  & 
+            sind(teta_obs)*sind(teta_cen)*cosd(long_obs-long_cen) 
+log_1 = (cos_delta + 1.d0) < eps
+!
+if( log_1 ) then
   u_teta = 0._dp ;  u_long = 0._dp 
  du_teta = 0._dp ; du_long = 0._dp  
                       endif 
@@ -12694,7 +12706,13 @@ END SUBROUTINE CONVOL_load_history
 !   the axis of simmetry of the load intersects the surface
 !   of the Earth at point LOAD_CENTER = (long., colat.)
 !
-!!
+!
+! # Fixed 'special case 5' (observer and load at the antipodes)
+!   (DM Feb 20, 2017)
+!
+
+!
+ real(dp), parameter :: eps = 1.D-200    ! Tolerance for antipode check
 !
  real(dp) ::   vect(4)    ! == ( u_rad,  u_teta,  u_long,   geoid)
  real(dp) :: d_vect(4)    ! == (du_rad, du_teta, du_long, d_geoid)
@@ -12866,10 +12884,14 @@ goto 123
 !
 ! 5) Load not at the pole, observer at its antipodes
 !
-log_1 = abs(long_ce - long_ob) == 180._dp 
-log_2 =     teta_ce + teta_ob  == 180._dp
+!log_1 = abs(long_ce - long_ob) == 180._dp 
+!log_2 =     teta_ce + teta_ob  == 180._dp
 !
-if( log_1 .or. log_2 ) then  
+!if( log_1 .or. log_2 ) then  
+!
+log_1 = (cos_teta + 1.d0) < eps
+!
+if( log_1 ) then
   vect(1) =  u ;   vect(2)=  0.D0;   vect(3)=  0.D0;   vect(4)=  h 
 d_vect(1) = du ; d_vect(2)=  0.D0; d_vect(3)=  0.D0; d_vect(4)= dh 
 goto 123
