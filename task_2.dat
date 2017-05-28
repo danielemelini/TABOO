@@ -1,0 +1,886 @@
+!Active
+!
+!
+! *****************************************************
+! * This is file "task_2.dat" : A SINGLE GLACIAL LOAD * 
+! *****************************************************
+!
+!
+!
+!
+!
+!
+!
+!
+!           
+!
+! +--------------------------------+
+! | Basic configuration of Task#2  |
+! +--------------------------------+
+! 
+! In order to allow TABOO to execute Task#2 it is necessary 
+! to input some basic information. This is done here by means of the
+! kw Harmonic_Degrees. The User must supply the following records: 
+!
+!
+! Harmonic_Degrees     <--- TABOO kw 
+! l_min l_max        <--- min and max harmonic degrees 
+! VERBOSE          <--- verbose mode (1->verbose, 0->silent) 
+! only_elastic   <--- (0/1) if=1, a purely elastic analysis is requested 
+! drop_modes   <--- (0/1) if=1, 'bad' modes are excluded from the computations   
+!
+Harmonic_Degrees
+        2  128                    
+       1                                                      
+    0          
+   0 
+!    
+!
+!
+!
+!
+!
+!
+!
+! +-------------------------------------------------------+
+! | Definition of the radial structure of the Earth model |
+! +-------------------------------------------------------+
+!
+!
+! At the time of this writing, the user can choose one of 
+! following models, where NV is the number of viscoelastic
+! layers and CODE allows to select a specific density and
+! rigidity profile, which is normally taken from the literature.
+! LT is the thickness of the elastic lithosphere, in km.
+! See APPENDIX A1 of the User Guide for further details.
+!
+!
+! NV=1  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=1  CODE=1 ---> Yuen Sabadini Boschi [1982], LT= 100 km.
+! NV=1  CODE=2 ---> Ondrej Cadek, LT= 70 km.
+! NV=1  CODE=3 ---> Ondrej Cadek, LT= 200 km.
+! NV=1  CODE=4 ---> Giunchi & Spada [2000] BUT self-g., 30 <= LT <= 300 km
+!
+! NV=2  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=2  CODE=1 ---> Averaged PREM, BUT d(rho)/rho at 670 from PREM, 30 <= LT <= 300 km.
+! NV=2  CODE=2 ---> Yuen Sabadini Boschi [1982], LT= 100 km.
+! NV=2  CODE=3 ---> Bills & James [1997], LT= 100 km.
+! NV=2  CODE=4 ---> Lefftz Sabadini Legros  [1994], LT= 150 km.
+! NV=2  CODE=5 ---> Piersanti Postseismic, LT= 80 km.
+! NV=2  CODE=6 ---> Ricard Sabadini Spada [1992], Model h, LT= 100 km.
+!
+! NV=3  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=3  CODE=1 ---> NOT Averaged Prem, 30 <= LT <= 300 km., see Sbr. SPEC for details
+! NV=3  CODE=2 ---> Cianetti Giunchi Spada [2002], LT=  120 km.
+! NV=3  CODE=3 ---> James & Morgan [1990] GRL (table #1), LT= 120 Km.
+! NV=3  CODE=4 ---> Similar to W. R. Peltier [1985], LT=  120 km.
+! NV=3  CODE=5 ---> Paul Johnston [benchmark, 1997], LT= 70 km.
+!
+! NV=4  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km.
+! NV=4  CODE=1 ---> Averaged PREM, LM not averaged in Rho, 40 <= LT <= 150 km.
+! NV=4  CODE=2 ---> Averaged Prem, LM not averaged in Rho nor Mu, 40 <= LT <= 150 km.
+!
+! NV=7  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km. 3 SM layers, 4 LM layers.
+!
+! NV=9  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km. 3 SM layers, 4 LM layers.
+!
+!
+! Please provide the following (see also the User guide):
+!
+! Make_Model  --->    Case sensitive Keyword, beginning in column one.
+! NV       --->   Number of Visco- Elastic layers (1,2,3,4,7, or 9)
+! CODE   --->    Choose a specific model from the above list 
+! LT     --->  Thickness of the lithosphere 
+! ILM     --->   Controls the thickness of the LM layers for NV=7 and 9. 
+! vis_bottom    ---> Viscosity of the bottom ve layer, in units of 10**21 Pa.s
+! ...
+! ... 
+! ...
+! vis_top      ---> Viscosity of the topmost ve layer, in units of 10**21 Pa.s.
+!
+!
+!
+!
+Make_Model
+           2
+	     0 
+            100.0                
+       0         
+      2.                        
+  1.0  
+!   
+!
+!
+!
+!                 The keyword External_Model Reads the modes from
+!                 the external file external.dat
+!                 and supersedes any choice made above regarding
+!                 the model to be employed. If External_Model is
+!                 active, Make_Model must be inactive.
+!                 See the User Guide.
+!
+!
+! External_Model
+!
+!
+!
+!
+!
+!
+!
+! +-----------------------+
+! |    LOAD  GEOMETRY     |
+! +-----------------------+
+!
+!
+!
+!
+!
+!
+!
+! This input section concerns those geometric properties of the ice load
+! which remain constant during its time evolution. The user must supply
+! three lines of records as follows:
+!
+!
+! Load_Geometry            <--- Case-sensitive TABOO keyword
+! CL                     <--- A code for the load
+! IOC p_1 p_2 ...      <--- Parameters
+!
+!
+! where CL, IOC, and the parameters P_k have the meaning shown
+! in the following table (see also the User guide):
+! 
+! 
+!+----------------------------------------------------+
+!       CL,    IOC,   p_1,    p_2,     p_3,     p_4   |
+!+----------------------------------------------------+
+!   
+!       10      0    LONG_C  COLA_C   AMPLIT     -
+!       11      0      "        "       "        -
+!       10      1      "        "       "        -
+!       20      0      "        "       "        -
+!       21      0      "        "       "        -
+!       20      1      "        "       "        -
+!       30      0      "        "       -        -
+!       30      1      "        "       -        -
+!       40      0      "        "       -        -
+!       50      0    LONG_C     DL    COLA_C     DT
+!       50      1      "        "       "        "
+!
+!       |       |      |    		         |
+!        INTEGER        <--- FLOATING  POINT --->
+!
+! where
+!
+!
+!   CL   = 10 ---> Disk load
+!   "    = 11 ---> Disc load AND complementary load
+!   "    = 20 ---> Parabolic load
+!   "    = 21 ---> Parabolic load AND complementary load
+!   "    = 30 ---> Point load
+!   "    = 40 ---> Harmonic load
+!   "    = 50 ---> Load with rectangular base
+!
+!  IOC   = 0  ---> Load  NOT compensated on real oceans
+!   "    = 1  ---> Load compensated on real oceans
+!
+!
+!
+!  For CL <=21:
+!
+!      LONG_C  = Longitude   of the center of the load (deg)
+!      COLA_C  = Co-latitude "   "    "    "   "    "  (deg)
+!      AMPLIT  = Angular amplitude of the load (deg)
+!
+!
+!  For CL = 30:
+!
+!      LONG_C  = Longitude   of the point load (deg)
+!      COLA_C  = Co-latitude "   "    "     "  (deg)
+!
+!
+!  For CL = 40:
+!
+!      LONG_C  = Longitude   of the pole of the load (deg)
+!      COLA_C  = Co-latitude "   "   "    "  "    " (deg)
+!
+!
+!  For CL = 50:
+!
+!      LONG_C  = Longitude   of the centroid of the load   (deg)
+!      DL      = Load width in longitude  (deg)
+!      COLA_C  = Co-latitude   of the centroid of the load   (deg)
+!      DT      = Load width in colatitude (deg)
+!
+!
+!
+!
+!
+!
+!
+! 
+Load_Geometry
+             10
+               0   0.  0.  15.0    
+!		
+!
+!
+!
+!
+!
+!
+!
+!
+! +-------------------+
+! |  TIME-HISTORY     |  
+! +-------------------+
+!
+!
+! 
+!+------------------------------------------------------+
+! *** Time-history #0: Instantaneous loading at t=0 kyrs
+!+------------------------------------------------------+
+! 
+! The load is proportional to f0, with: 
+!
+! f0(t) = H(t)   
+! H(x)=Heaviside step function= 1 for x>=0, and 0 elsewhere
+!
+! The input must have the format:
+!                                  
+!
+! Load_History        <-- Keyword
+! 0                      <-- Time-History label
+! PAR                          <--- A parameter
+!
+!
+! where:
+!
+!    if CL <=21,  PAR = ice thickness for t>=0 (m)
+!    if CL  =50,  PAR = ice thickness for t>=0 (m)
+!    if CL  =30,  PAR = mass of the load for t>=0 (kg)
+!    if CL  =40,  PAR = load at the load pole for t>=0 (kg/m**2)
+!
+!    ---> See the user guide for further details <---
+!
+!
+!
+ Load_History
+ 0
+  2076.92                  ! For the Laurentide gives 1.8 10**19 kg
+!
+!
+!
+!
+!
+!
+!
+!
+!+--------------------------------------------------------+
+! *** Time-history #1:  Instantaneous Unloading at t=0 kyrs
+!+--------------------------------------------------------+
+!
+! 
+! The load is proportional to f1, with: 
+!
+! f1(t) = 1-H(t)     
+! H(x)=Heaviside step function= 1 for x>=0, and 0 elsewhere
+!
+! The input must have the format:
+!                                  
+!
+! Load_History        <-- Keyword, case-sensitive, column #1
+! 1                      <-- Time-History label
+! PAR                          <--- A parameter
+!
+!
+! where:
+!
+!    if CL <=21,  PAR = ice thickness for t<0 (m)
+!    if CL  =50,  PAR = ice thickness for t<0 (m)
+!    if CL  =30,  PAR = mass of the load for t<0 (kg)
+!    if CL  =40,  PAR = load at the load pole for t<0 (kg/m**2)
+!
+!    ---> See the user guide for further details <---
+!
+!
+!
+Load_History
+ 1
+    2000.0
+!
+!
+!
+!
+!
+!+---------------------------------------------+
+! *** Time-history #2: Loading & Unloading     |
+!+---------------------------------------------+
+!
+! 
+! The load is proportional to f2, where: 
+!
+! f2(t) = H(t+tau) - H(t)    
+! H(x)=Heaviside step function= 1 for x>=0, and 0 elsewhere
+!
+! The input must have the format:
+!                                  
+!
+! Load_History        <-- Keyword 
+! 2                      <-- Time-History label
+! TAU           <-- Time elapsed from loading to unloading (kyr)
+! PAR                          <--- A parameter
+!
+!
+! where:
+!
+!    if CL <=21, PAR = ice thickness for -TAU <= t < 0 (m)
+!    if CL  =50, PAR = ice thickness for -TAU <= t < 0 (m)
+!    if CL  =30, PAR = mass of the load for -TAU <= t < 0 (kg)
+!    if CL  =40, PAR = load at the load pole for -TAU <= t < 0 (kg/m**2)
+!
+!    ---> See the user guide for further details <---
+!
+!
+!
+!   Load_History
+! 2
+!   10.0
+!    2076.92
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! +----------------------------------------+
+! *** Time-history #3: Simple deglaciation |
+! +----------------------------------------+
+! 
+! The load is proportional to f3, where: 
+!
+! if -oo <= t <  0    ---> f3(t) = 1
+! if  0  <= t <= TAU   ---> f3(t) = 1-t/TAU
+! if        t >  TAU  ---> f3(t) = 0
+!
+! The input must have the format:
+!
+!
+!Load_History       <-- Keyword 
+!         3                     <-- Time-History label
+!    TAU                 <--- Duration of the deglaciation (kyr)
+!  PARAMETER                             <--- A parameter
+!
+!
+! where:
+!
+!    if CL <=21,  PARAMETER = ice thickness for t<0 (m)
+!    if CL  =50,  PARAMETER = ice thickness for t<0 (m)
+!    if CL  =30,  PARAMETER = mass of the load for t<0 (kg)
+!    if CL  =40,  PARAMETER = load at the load pole for t<0 (kg/m**2)
+!
+!    ---> See the user guide for further details <---
+!
+!
+!
+ Load_History
+    3
+     10.0
+    2000.0        !2076.92
+!
+!
+!
+!
+!
+!
+!
+!
+!+----------------------------------------------+
+! *** Time-history #4: Saw-tooth time history   |
+!+----------------------------------------------+
+! 
+! The load is proportional to f4, where: 
+!
+! f4(t) = f_0 + f_1 + ... + f_NPH
+! f_n = [H(t+n*teta+tauc -H(t+n*teta)     ]*( t+n*teta+tauc)/tauc + &
+!       [H(t+n*teta      -H(t+n*teta-dinc)]*(-t-n*teta+dinc)/dinc
+! teta= tauc+dinc
+! H(x)=Heaviside step function= 1 for x>=0, and 0 elsewhere
+!
+! The input must have the format:
+!
+!
+!Load_History         <-- Keyword 
+! 4                          <-- Time-History label
+! NPH                          <--- Number of phases IN ADDITION TO THE LAST
+! TAUC                        <--- Duration of the loading phases (kyr)
+! DINC                     <--- Duration of the unloading phases (kyr)
+! PARAMETER                          <--- A parameter
+!
+!
+! where:
+!
+!    if CL <=21,  PARAMETER = ice thickness at t=0 (m)
+!    if CL  =50,  PARAMETER = ice thickness for t=0 (m)
+!    if CL  =30,  PARAMETER = mass of the load for t=0 (kg)
+!    if CL  =40,  PARAMETER = load at the load pole for t=0 (kg/m**2)
+!
+!    ---> See the user guide for further details <---
+!
+!
+!
+!
+! 
+ Load_History
+ 4
+ 5
+      90.0
+      10.0
+ 2080. 
+!
+!
+!
+!
+!
+!
+!
+!
+!+------------------------------------------+
+! *** Time-history #5: Sinusoidal loading   |
+!+------------------------------------------+
+! 
+! The load is proportional to f5, where: 
+!
+! f5 = (1/2)*[1 + sin(2*pi*t/T)]. 
+!
+! The input must have the format:
+!
+!
+!Load_History         <-- Keyword 
+! 5                          <-- Time-History label
+! T               <--- Period of the sinusoid (kyrs)
+! PARAMETER                          <--- A parameter
+!
+!
+! where:
+!
+!    if CL <=21,  PARAMETER= maximum ice thickness (m)
+!    if CL  =50,  PARAMETER = maximum ice thickness (m)
+!    if CL  =30,  PARAMETER = maximum mass of the load (kg)
+!    if CL  =40,  PARAMETER = maximum load at the load pole (kg/m**2)
+!
+!    ---> See the user guide for further details <---
+!
+!
+! e.g. 
+  Load_History
+ 5
+   25.
+ 2076.92
+!
+!
+!
+!
+!
+!+--------------------------------------+
+! *** Time-history #6: Piecewise linear |
+!+--------------------------------------+
+!
+! f6 = Piecewise linear (see User guide) 
+!
+! The input must have the format:
+!
+!
+! Load_History             <--- Keyword
+!   6                         <---Time- history label
+!
+!
+! The user must also supply the file 'timeh_6.dat'. See
+! the user guide for instructions  on how to prepare it.
+!
+  Load_History
+                        6
+! 
+! 
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!+---------------------------------------+
+! *** Time-history #7: Piecewise constant
+!+---------------------------------------+
+!
+! f7 = Piecewise constant  (see User guide) 
+!
+! The input must have the format:
+!
+!
+! Load_History             <--- Keyword, case-sensitive, column #1
+!   7                         <---Time- history label
+!
+!
+! The user must also supply the file 'timeh_7.dat'. See
+! the user guide for instructions on how to prepare it.
+!
+ Load_History
+                        7
+! 
+! 
+!
+!
+!
+!+----------------------------------------------------------------+
+! *** Time-history #8: Piecewise constant with finite loading phase
+!+----------------------------------------------------------------+
+!
+! f8 = Piecewise constant with finite loading phase
+!      (see User guide) 
+!
+! The input must have the format:
+!
+!
+! Load_History             <--- Keyword 
+!   8                         <--- Time- history label
+!
+!
+! The user must also supply the file 'timeh_8.dat'. See
+! the user guide for instructions on how to prepare it.
+!
+ Load_History
+                        8
+! 
+! 
+!
+!
+!
+!
+!
+! +----------------------------------+
+! |   Choice of the LOCAL Analysis   |
+! +----------------------------------+
+!
+!
+!	This section allows to configure the KW Local_Study.
+!  The parameters of this KW describe the spatial and
+!  temporal features of the analysis to be performed. Concerning 
+!  the temporal parameters, one should take into
+!  account that the origin of the time axis has been conventionally
+!  chosen to coincide with specific features of the various
+!  time-histories, as follows:
+!
+!  For th#0  the time t=0  is the time of loading
+!
+!   "  th#1   "    "   "   is the time of un-loading
+!
+!   "  th#2   "    "   "   is the time of un-loading
+!
+!   "  th#3   "    "   "   coincides with the beginning of
+!                                                deglaciation
+!
+!   "  th#4   "    "   "   coincides with the beginning of
+!                                     the last deglaciation phase
+!
+!   "  th#5  at time   t=0  the load is 0.5 times its maximum
+!
+!   "  th#6  the time  t=0  marks the beginning of
+!                            the piecewise linear phase
+!
+!   "  th#7  the time  t=0  marks the beginning of
+!                            the piecewise constant phase
+!
+!   "  th#8  the time  t=0  marks the the beginning of the
+!                            piecewise constant phase
+!
+!
+!
+!
+! ----------------------------------------------------------+
+! Local analysis of Type#1: One observer, and various times |
+! ----------------------------------------------------------+
+!
+! In this analysis, the fields are computed at a given point
+! ("observer") with coordinates LON (longitude) and COL (colatitude),
+! for times between TMIN and TMAX with increments equal to DELTAT.
+!
+! The user must supply the following records:
+!
+!
+! Local_Study                          <--- kw 
+! 1                                         <--- Labels the type of analysis
+! IR, IT, IG, DIR, DIT, DIG   <--- Switches (0/1) to select the fields
+! LON COL                                   <--- Coordinates of the observer
+! TMIN TMAX DELTAT                         <---  TMIN, TMAX, and DELTAT (kyrs)
+! ISUB     <--- (0/1) If =0 the Sbr. AXIS_DISP0 is used, otherwise ESSA_IEZI0
+!
+!
+!
+Local_Study
+ 1
+  1 1 1 1 1 1
+    0.0  18.0 
+      -10.0 20.0 0.5  
+ 0
+!
+!
+!
+!
+! ------------------------------------------------------------+
+! Local analysis of Type#2: More observers, and various times |
+! ------------------------------------------------------------+
+!
+! In this analysis, the fields are computed on a set of points provided 
+! by an user supplied file. Each row of this file, written in
+! free format, contain LONG_k, COLA_k (k=1, ...,N), where LONG_k and
+! COLA_k are the coordinates of the k-th observer in DEGREES. The maximum 
+! number of observers is N=12000. The time window, specified by the 
+! parameters  TMIN, TMAX, and DELTAT as in the local analysis of Type#1 
+! (see above), applies to all of the observers.      
+! 
+! The user must supply the following records:
+!
+! 
+! Local_Study                <--- Keyword   
+! 2                               <--- Labels this type of analysis
+! IR, IT, IG, DIR, DIT, DIG   <--- Switches (0/1) to select the fields
+! FILENAME       <---  user-supplied filename (max 20 characters)
+! TMIN TMAX DELTAT             <---  TMIN, TMAX, and DELTAT (kyrs) 
+! ISUB <--- (0/1) If =0 the Sbr. AXIS_DISP0 is used, otherwise ESSA_IEZI0
+!
+!  
+ Local_Study 
+ 2
+   1 1 1   1 1 1 
+sparsi.dat 
+   0.0  10.0 1.0 
+  0 
+!
+!
+!
+!
+!
+! ------------------------------------------------------------+
+! Local analysis of Type#3: Along a meridian, at a given time |
+! ------------------------------------------------------------+
+!
+! In this analysis, the fields are computed on regularly spaced points 
+! placed along the meridian of longitude LONG. The range of colatitudes 
+! is [C1:C2] and EPC is the increment in colatitude. LONG, C1, C2, 
+! and EPC are to be  given in units of degrees. The fields are computed 
+! at the time GIVEN_TIME (kyrs). 
+!
+! The user must supply the following records:
+!
+! Local_Study                         <--- Keyword  
+! 3                                       <--- Labels the type of analysis
+! IR, IT, IG, DIR, DIT, DIG   <--- Switches (0/1) to select the fields
+! LONG C1 C2 EPC  <--- Meridian longitude, colatitude bounds & increment (deg)
+! GIVEN_TIME         <---  Time (kyr)  
+! ISUB     <--- (0/1) If =0 the Sbr. AXIS_DISP0 is used, otherwise ESSA_IEZI0  
+!
+!
+ Local_Study
+   3
+   1 1 1   1 1 1
+     0.0    0.0 180.0 1.0  
+  8.0 
+      0 
+!
+!
+!
+!
+!
+!
+! ------------------------------------------------------------+
+! Local analysis of Type#4: Along a parallel, at a given time |
+! ------------------------------------------------------------+
+!
+! In this analysis, the fields are computed on regularly spaced points 
+! placed along the parallel of colatitude COLA. The range of longitudes 
+! is [L1:L2] and EPL is the increment in colatitude. COLA, L1, L2, 
+! and EPL are to be  given in units of DEGREES. The fields are computed 
+! at the time GIVEN_TIME (units of kyrs). 
+!
+! The user must supply the following records:
+!
+! Local_Study       <--- Keyword                             
+! 4                       <--- Label for this type of analysis                        
+! IR, IT, IG, DIR, DIT, DIG   <--- Switches (0/1) to select the fields 
+! COLA L1 L2 EPL <--- Parallel colatitude, longitude bounds & increment (deg)  
+! GIVEN_TIME      <---  Time (kyr)                                     
+! ISUB     <--- (0/1) If =0 the Sbr. AXIS_DISP0 is used, otherwise ESSA_IEZI0
+!  
+ Local_Study
+ 4
+ 1 1 1   1 1 1
+ 35.0  0. 360.  1.0 
+ 10.0
+     0
+!
+!
+!
+!
+! ----------------------------------------------------+
+! Local analysis of Type#5: On a map, at a given time |
+! ----------------------------------------------------+
+!
+! In this analysis, the fields are computed on a regular grid of
+! points on the Earth surface. On the grid points the longitude
+! and the colatitude vary in the ranges [L1:L2] and [C1:C2] degrees, 
+! respectively. The increments are EPL degrees in longitude  and EPC 
+! degrees in colatitude. The fields are computed at the time GIVEN_TIME 
+! (in units of kyrs, as usual). 
+!
+! The user must supply the following records:
+!
+! Local_Study           <--- Keyword  
+! 5                          <--- Label for this type of analysis     
+! IR, IT, IG, DIR, DIT, DIG   <--- Switches (0/1) to select the fields   
+! L1 L2 EPL                  <--- Bounds in longitude & increment (deg)      
+! C1 C2 EPC                 <--- Bounds in colatitude  & increment (deg)   		         
+! GIVEN_TIME               <---  Time (kyr)               
+! ISUB     <--- (0/1) If =0 the Sbr. AXIS_DISP0 is used, otherwise ESSA_IEZI0
+!
+!
+ Local_Study 
+ 5
+   1 1 1 1 1 1 1
+    0.0 40.0 1.0       
+        40.0 65.0 1.0 
+    18.0
+   0     
+!	  
+!
+!	  
+!
+!
+! +-----------------------------------+
+! |   Choice of the GLOBAL Analysis   |
+! +-----------------------------------+
+!
+!
+!	This section allows to configure the KW Global_Study.
+!  The parameters of this KW describe the features of the analysis 
+!  to be performed. With respect to the temporal parameters, one 
+!  should take into account that the origin of the time axis has been 
+!  conventionally chosen to coincide with specific features of the 
+!  various time-histories, as follows:
+!
+!  For th#0  the time t=0  is the time of loading
+!
+!   "  th#1   "    "   "   is the time of un-loading
+!
+!   "  th#2   "    "   "   is the time of un-loading
+!
+!   "  th#3   "    "   "   coincides with the beginning of
+!                                                deglaciation
+!
+!   "  th#4   "    "   "   coincides with the beginning of
+!                                     the last deglaciation phase
+!
+!   "  th#5  at time   t=0  the load is 0.5 times its maximum
+!
+!   "  th#6  the time  t=0  marks the beginning of
+!                            the piecewise linear phase
+!
+!   "  th#7  the time  t=0  marks the beginning of
+!                            the piecewise constant phase
+!
+!   "  th#8  the time  t=0  marks the the beginning of the
+!                            piecewise constant phase
+!
+!
+!
+!
+!
+! --------------------------------------------------------+
+! Global analysis of Type#1: Stokes coefficients vs time  | 
+! --------------------------------------------------------+
+!
+! This analysis allows to compute the variations of the Stokes 
+! coefficients of degree L and order M and their time derivatives 
+! as a function of time.  The time range is [TMIN:TMAX] kyrs, 
+! and the time increment is DELTAT kyrs. 
+!
+!  
+! Global_Study 	 <--- Keyword  
+! 1  		          <--- Label for this type of analysis  
+! L M             <--- Degree [2:36] & order of the Stokes coefficient
+! Inorm        <--- (0/1) If = 1, the coefficients will be fully normalized  
+! TMIN TMAX DELTAT     <---  TMIN, TMAX, and DELTAT (kyrs) 
+!  
+!
+   Global_Study 
+ 1
+ 5 0 
+   0
+   -80.0 26.0 3.10 
+!
+!
+!
+!
+! ---------------------------------------------------------+
+! Global analysis of Type#2: Stokes coefficients vs degree | 
+! ---------------------------------------------------------+
+!
+! This analysis allows to compute the variations of the Stokes 
+! coefficients and their time derivatives for degrees in the range 
+! [LDE1:LDE2] at time GIVEN_TIME kyrs. 
+!
+!
+! Global_Study          <--- Keyword  
+! 2                    <--- Label for this type of analysis   
+! LDE1 LDE2       <--- Degrees LDE1 & LDE2 [2:36] 
+! Inorm       <--- (0/1) If = 1, the coefficients will be fully normalized 
+! GIVEN_TIME    <---  Time (kyr)   
+!
+!
+
+ Global_Study 
+ 2
+  2 12
+      1
+         10.0 
+!  
+!
+!
+!
+!
+! ---------------------------------------------------+
+! Global analysis of Type#3: Inertia tensor vs time  | 
+! ---------------------------------------------------+
+!
+! This analysis allows to compute the variations of the Inertia 
+! tensor and their time derivatives as a function of time.  The time
+! range is [TMIN:TMAX] kyrs, and the time increment is DELTAT kyrs. 
+!
+!
+! Global_Study     <--- Keyword  
+! 3                   <--- Label for this type of analysis  
+! TMIN TMAX DELTAT      <---  TMIN, TMAX, and DELTAT (kyrs) 
+!
+!
+!
+!Global_Study
+ 3
+  -20.0 13.0 1.10
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!

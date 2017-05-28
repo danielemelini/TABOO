@@ -1,0 +1,178 @@
+!Active
+!
+!
+! +---------------------------------+
+! |  This is file << task_1.dat >>  |
+! +---------------------------------+
+!
+!
+! +--------------------------------+
+! | Basic configuration of Task#1  |
+! +--------------------------------+
+! 
+! In order to allow TABOO to execute Task#1 it is necessary 
+! to input some basic information. This is done by means of  
+! kw Harmonic_Degrees. The User must supply the following records: 
+!
+!
+! Harmonic_Degrees     <--- TABOO kw 
+! l_min l_max        <--- min and max harmonic degrees 
+! VERBOSE          <--- verbose mode (1->verbose, 0->silent) 
+! i_loading       <--- I_loading (loading ->1, tidal->0)
+!
+!
+!
+Harmonic_Degrees
+    2   128
+    1
+    1	
+!
+!
+!
+!
+!
+!
+!
+! +-------------------------------------------------------+
+! | Definition of the radial structure of the Earth model |
+! +-------------------------------------------------------+
+!
+!
+! At the time of this writing, the user can choose between the
+! following models, where NV indicates the number of viscoelastic
+! layers and CODE allows to select a specific density and
+! rigidity profile, which is normally taken from the literature.
+! LT is the thickness of the elastic lithosphere, in km.
+! See the User guide and the theory document for further details.
+!
+!
+! NV=1  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=1  CODE=1 ---> Yuen Sabadini Boschi [1982], LT= 100 km.
+! NV=1  CODE=2 ---> Ondrej Cadek, LT= 70 km.
+! NV=1  CODE=3 ---> Ondrej Cadek, LT= 200 km.
+! NV=1  CODE=4 ---> Giunchi & Spada [2000] BUT self-g., 30 <= LT <= 300 km
+!
+! NV=2  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=2  CODE=1 ---> Averaged PREM, BUT d(rho)/rho at 670 from PREM, 30 <= LT <= 300 km.
+! NV=2  CODE=2 ---> Yuen Sabadini Boschi [1982], LT= 100 km.
+! NV=2  CODE=3 ---> Bills & James [1997], LT= 100 km.
+! NV=2  CODE=4 ---> Lefftz Sabadini Legros  [1994], LT= 150 km.
+! NV=2  CODE=5 ---> Piersanti Postseismic, LT= 80 km.
+! NV=2  CODE=6 ---> Ricard Sabadini Spada [1992], Model h, LT= 100 km.
+!
+! NV=3  CODE=0 ---> Averaged PREM, 30 <= LT <= 300 km.
+! NV=3  CODE=1 ---> NOT Averaged Prem, 30 <= LT <= 300 km., see Sbr. SPEC for details
+! NV=3  CODE=2 ---> Cianetti Giunchi Spada [2002], LT=  120 km.
+! NV=3  CODE=3 ---> James & Morgan [1990] GRL (table #1), LT= 120 Km.
+! NV=3  CODE=4 ---> Similar to W. R. Peltier [1985], LT=  120 km.
+! NV=3  CODE=5 ---> Paul Johnston [benchmark, 1997], LT= 70 km.
+! NV=3  CODE=6 ---> Vermeersen & Sabadini LT= 120 km.
+! NV=3  CODE=7 ---> Model "M3-L70-V01" reference model for the "Test suite" - 20
+09
+!
+! NV=4  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km.
+! NV=4  CODE=1 ---> Averaged PREM, LM not averaged in Rho, 40 <= LT <= 150 km.
+! NV=4  CODE=2 ---> Averaged, LM not averaged in Rho nor Mu, 40 <= LT <= 150 km.
+!
+! NV=7  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km. 3 SM layers, 4 LM layers.
+!
+! NV=9  CODE=0 ---> Averaged PREM, 40 <= LT <= 150 km. 3 SM layers, 4 LM layers.
+!
+!
+! Please provide the following (see also the User guide):
+!
+! Make_Model  --->    Case sensitive Keyword, beginning in column one.
+! NV       --->   Number of Visco- Elastic layers (1,2,3,4,7,9, o 10)
+! CODE   --->    Choose a specific density and rigidity profile from the above list.
+! LT     --->  Thickness of the elastic lithosphere (ignored for certain CODE values!)
+! ILM     --->   Controls the thickness of the LM layers for NV=7 and 9. Otherwise ignored.
+! vis_bottom    ---> Viscosity of the bottom ve layer, in units of 10**21 Pa.s
+! ...
+! ... 
+! ...
+! vis_top      ---> Viscosity of the topmost ve layer, in units of 10**21 Pa.s.
+!
+!
+!
+ Make_Model
+           3
+         4         code
+        150.0         LT
+      0                          ilm
+       2.0
+       1.0 
+     1.0 
+!
+!
+!
+!
+!
+!
+!                 The keyword External_Model Reads the modes from
+!                 the external file external.dat
+!                 and supersedes any choice made above regarding
+!                 the model to be employed. If External_Model is
+!                 active, Make_Model must be inactive.
+!                 See the User Guide.
+!
+!
+External_Model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! +--------------------------------+
+! |     Normalized Residues        |
+! +--------------------------------+
+!
+!
+Normalized_Residues
+ 1           <--- If  1  is given, I write -h(i)/s(i) vs. log(deg) on 'ih.dat'
+  1          <---   If  1   "   "     "   "  -l(i)/s(i) vs.    "     on 'il.dat'
+    1            <---  If  1   "   "     "   "  -k(i)/s(i) vs.    "     on 'ik.dat'
+!
+!
+!
+!
+! +-------------------------------------------------+
+! |     Elastic, Visco- elastic, and Fluid ldc      |
+! |      as a function of the Harmonic Degree       |
+! +-------------------------------------------------+
+!
+!
+El_Fluid_Viscel
+1     <--- If 1 is given here, I write h_e, h_f, e h_i vs. deg. on 'h.dat'
+ 1      <--- If 1  "   "     " , I write l_e, l_f, e l_i vs. deg. on 'l.dat'
+ 1      <--- If 1  "   "     " , I write k_e, k_f, e k_i vs. deg. on 'k.dat'
+!
+!
+!
+!
+!
+!
+!
+!
+! +-------------------------------------+
+! |  Time evolution of Heaviside Ldcs   |
+! +-------------------------------------+
+!
+!
+ Heaviside_th
+2              <-- Number of harmonic degrees for which the computation is done (max is 6)
+2 26        <-- Degrees for the computation
+1.d-3         <-- Lower bound of the time window, in kyr, must be > 0
+1.d+5           <-- Upper   "    "  "    "     "  ,  "  " , must be > 0 and > Lower bound
+11            <-- Number of intermediate points (<= 2001)
+ 1              <-- If 1 is placed here, I write  h/(2*deg+1) vs. time on 'h_heav.dat'
+  1             <-- If 1 is placed here, I write  l vs. time on 'l_heav.dat'
+1                  <-- If 1 is placed here, I write  k vs. time on 'k_heav.dat'
+!
+!
+!
+!
+!
