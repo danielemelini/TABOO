@@ -28,6 +28,8 @@
 !        M3-L70-V01. Adjusted the precision of PI values and
 !        of the gravitational constant. Adjusted ice density to
 !        931 kg/m**3 [r11]
+!      - DM, June 16, 2020
+!        Fixed some issues with External_Model
 !
  module STRATA 
 ! defines the kinds an PI 
@@ -130,10 +132,11 @@ save
  real(dp), parameter :: raggio    = 6.371D6    ! Earth radius (m)
  real(dp), parameter :: ref_emass = 5.97D24    ! Reference Earth mass (kg)
  real(dp), parameter :: ref_rhoea = 5.51157D3  ! Reference average density (kg/m3)
+ real(dp), parameter :: ext_rhoea = 5.51467D3  ! Average density for the external model (kg/m3)
  real(dp), parameter :: rhoice    = 931.D0     ! Ice density (kg/m3)
 !
  real(dp) :: emass                             ! Earth mass (kg)
- real(dp) :: rhoea                             ! Ice density (kg/m3)
+ real(dp) :: rhoea                             ! Earth density (kg/m3)
 !
 integer(i4b), parameter :: nv_max     =  24  ! maximum allowed number of v.e. layers 
 integer(i4b), parameter :: nroots_max =  96  ! maximum allowed number of modes  
@@ -1081,6 +1084,8 @@ IF(IV==1) WRITE(* ,*) 'Looking now for KWs Ad_Hoc (or) Ice_*'
    iexte=1
 !
    n_exte=n_exte+1
+!
+   rhoea = ext_rhoea
 !
    call m_3(30060)  ! Checks if Make_Model is active
 !
@@ -4574,7 +4579,9 @@ IF(IV==1) WRITE(* ,*) 'Looking now for KWs Load_Geometry and Load_History'
            call m_2(20040) ! Model description & a warning
 !
 !
-    NV=1    
+    rhoea = ext_rhoea
+!	
+	NV=1    
     NROOTS=3 
 !    
  Open(67, file='external_spectrum.dat',status='unknown')   
@@ -4640,9 +4647,11 @@ DO l=lmin, lmax
 ENDDO
  close(3)
 ! 
-          if(drop_modes==0) then 
+ do l=lmin, lmax
+!
+      if(drop_modes==0) then 
 	                   do k=1, nroots
-	                 r_h (l,k) = h_v(l,k)/s(l,k)      ! Normalized residue for h
+	                     r_h (l,k) = h_v(l,k)/s(l,k)      ! Normalized residue for h
                          r_l (l,k) = l_v(l,k)/s(l,k)      ! Normalized residue for l
                          r_k (l,k) = k_v(l,k)/s(l,k)      ! Normalized residue for k
                          tek (l,k) = -1.0/s(l,k)     
@@ -4669,7 +4678,8 @@ ENDDO
 !
              endif 
 !
-
+ end do
+!
 !++++++++++
    Endif  
 !++++++++++
@@ -8292,6 +8302,9 @@ ENDDO; close(3)
 !
    inone=1
    iexte=1  
+!   
+   rhoea = ext_rhoea
+!
 !
 !
     IF(ideja==1.and.IV==0) then
