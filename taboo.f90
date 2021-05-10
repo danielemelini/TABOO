@@ -31,7 +31,8 @@
 !      - DM, June 16, 2020
 !        Fixed some issues with External_Model
 !      - DM, May 10, 2021
-!        Added the VM5a model (NV=5, CODE=0)
+!        Added the VM5a model (NV=5, CODE=0) and the
+!        VM7 model (NV=8, CODE=0)
 !
  module STRATA 
 ! defines the kinds an PI 
@@ -13537,11 +13538,11 @@ INTEGER (i4b) :: idens   ! density inversions switch (0/1)
 !
 !
 !
-If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=5.and.nv/=7.and.nv/=9.and.iv==0)Then
+If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=5.and.nv/=7.and.nv/=8.and.nv/=9.and.iv==0)Then
 Write(99,*)'ERROR IN SBR. SPEC: The required model is not available '
 WRITE(99,*)'in the models library. **** JOB ABORTED *************** ';STOP
 Endif
-If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=5.and.nv/=7.and.nv/=9.and.iv==1)Then
+If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=5.and.nv/=7.and.nv/=8.and.nv/=9.and.iv==1)Then
 Write (*,*)'ERROR IN SBR. SPEC: The required model is not available '
 WRITE (*,*)'in the models library. **** JOB ABORTED *************** ';STOP
 Endif
@@ -14297,7 +14298,7 @@ Write(99,*)'Lower mantle 1                  (Thick =  590 km) '
 Write(99,*)'Lower mantle 2 down to the CMB                    '
 !
 IF(iv==1) THEN
-Write(*,*) 'VM5a viscosity model (PREM-averaged)              '
+Write(*,*) 'VM5a viscosity model (PREM-averaged)                            '
 Write(*,*) 'Lithosphere                  (40 <= LT <= 100 km) '
 Write(*,*) 'Lower lithosphere               (Thick =   40 km) '
 Write(*,*) 'Upper mantle                 (280 <= Thick <=340) '
@@ -14455,6 +14456,93 @@ rmu (0) = 0._qp
 endif 
 !
 ENDIF  ! Endif on NV=7
+!
+!
+!
+!
+!
+! #--------------------#
+! #       NV = 8       #
+! #--------------------#
+!
+!
+!
+  IF (NV == 8) THEN 
+! 
+!                                      
+! NV=7  CODE=0 ---> VM7
+!
+!
+if((CODE <0 .or. CODE >0) .and. iv==0) Then
+Write(99,*) 'ERROR in Sbr SPEC: The CODE is not available'
+Write(99,*) '**** JOB ABORTED ***************************';STOP
+Endif 
+if((CODE <0 .or. CODE >0) .and. iv==1) Then
+Write (*,*) 'ERROR in Sbr SPEC: The CODE is not available'
+Write (*,*) '**** JOB ABORTED ***************************';STOP
+Endif 
+!
+!
+!
+If(CODE == 0) then 
+!
+Write(99,*) '8-layers PREM averaged VM7 mantle model:  '
+Write(99,*) 'Elastic lithosphere with thickness LT = 75km '
+Write(99,*) 'Shallow upper mantle 1  (Thick   =   40 km)            '
+Write(99,*) 'Shallow upper mantle 2  (Thick   =  305 km)            '
+Write(99,*) 'Transition zone         (Thick   =  250 km)            '
+Write(99,*) 'Lower mantle 1          (Thick   =  310 km)            '
+Write(99,*) 'Lower mantle 2          (Thick   =  490 km)            '
+Write(99,*) 'Lower mantle 3          (Thick   =  480 km)            '
+Write(99,*) 'Lower mantle 4          (Thick   =  450 km)            '
+Write(99,*) 'Lower mantle 5 down to the CMB                         '
+!
+IF(iv==1) THEN
+Write(*,*)  '8-layers PREM averaged VM7 mantle model:  '
+Write(*,*)  'Elastic lithosphere with thickness LT = 75km '
+Write(*,*)  'Shallow upper mantle 1  (Thick   =   40 km)            '
+Write(*,*)  'Shallow upper mantle 2  (Thick   =  305 km)            '
+Write(*,*)  'Transition zone         (Thick   =  250 km)            '
+Write(*,*)  'Lower mantle 1          (Thick   =  310 km)            '
+Write(*,*)  'Lower mantle 2          (Thick   =  490 km)            '
+Write(*,*)  'Lower mantle 3          (Thick   =  480 km)            '
+Write(*,*)  'Lower mantle 4          (Thick   =  450 km)            '
+Write(*,*)  'Lower mantle 5 down to the CMB                         '
+ENDIF
+!
+nroots=4*nv
+!
+!
+r(9)    = rade                   ! Radius of the Earth 
+r(8)    = rade-75._qp            ! Litho with thickness LT = 75km  
+r(7)    = rade-115._qp           ! Discontinuity at 115 km depth
+r(6)    = rade-420._qp           !       "          420 km "   " 
+r(5)    = rade-670._qp           !       "          670 km "   " 
+r(4)    = rade-980._qp           !       "          980 km "   " 
+r(3)    = rade-1470._qp          !       "         1470 km "   " 
+r(2)    = rade-1950._qp          !       "         1950 km "   " 
+r(1)    = rade-2400._qp          !       "         2400 km "   " 
+r(0)    = rcmb 
+!
+!
+!
+!
+call prem(r(0), 0.q0, rmu(0), rho(0))  ! Core 
+call prem(r(1), r(0), rmu(1), rho(1))  ! LM(1) 
+call prem(r(2), r(1), rmu(2), rho(2))  ! LM(2) 
+call prem(r(3), r(2), rmu(3), rho(3))  ! LM(3) 
+call prem(r(4), r(3), rmu(4), rho(4))  ! LM(4) 
+call prem(r(5), r(4), rmu(5), rho(5))  ! LM(5)
+call prem(r(6), r(5), rmu(6), rho(6))  ! TZ 
+call prem(r(7), r(6), rmu(7), rho(7))  ! UM(1)
+call prem(r(8), r(7), rmu(8), rho(8))  ! UM(2) 
+call prem(r(9), r(8), rmu(9), rho(9))  ! Lito  
+rmu (0) = 0._qp  
+!
+endif 
+!
+ENDIF  ! Endif on NV=8
+
 !
 !
 !
