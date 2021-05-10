@@ -30,6 +30,8 @@
 !        931 kg/m**3 [r11]
 !      - DM, June 16, 2020
 !        Fixed some issues with External_Model
+!      - DM, May 10, 2021
+!        Added the VM5a model (NV=5, CODE=0)
 !
  module STRATA 
 ! defines the kinds an PI 
@@ -13535,11 +13537,11 @@ INTEGER (i4b) :: idens   ! density inversions switch (0/1)
 !
 !
 !
-If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=7.and.nv/=9.and.iv==0)Then
+If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=5.and.nv/=7.and.nv/=9.and.iv==0)Then
 Write(99,*)'ERROR IN SBR. SPEC: The required model is not available '
 WRITE(99,*)'in the models library. **** JOB ABORTED *************** ';STOP
 Endif
-If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=7.and.nv/=9.and.iv==1)Then
+If(NV/=1.and.nv/=2.and.nv/=3.and.nv/=4.and.nv/=5.and.nv/=7.and.nv/=9.and.iv==1)Then
 Write (*,*)'ERROR IN SBR. SPEC: The required model is not available '
 WRITE (*,*)'in the models library. **** JOB ABORTED *************** ';STOP
 Endif
@@ -14255,6 +14257,92 @@ endif
 !
 !
 ENDIF  ! Endif on NV=4
+!
+!
+!
+!
+!
+! #--------------------#
+! #       NV = 5       #
+! #--------------------#
+!
+!
+! 
+  IF (NV == 5) THEN 
+!
+!                                          
+! NV=5  CODE=0 ---> VM5a, 40 <= LT <= 100 km
+!
+!
+if((CODE <0 .or. CODE >0) .and. iv==0) Then
+Write(99,*)'ERROR in SPEC: The model CODE is not available'
+Write(99,*)'**** JOB ABORTED *****************************';STOP
+Endif
+if((CODE <0 .or. CODE >0) .and. iv==1) Then
+Write (*,*)'ERROR in SPEC: The model CODE is not available'
+Write (*,*)'**** JOB ABORTED *****************************';STOP
+Endif 
+!
+!
+!
+If(CODE == 0) then 
+!
+!
+Write(99,*)'VM5a viscosity model (PREM-averaged)              '
+Write(99,*)'Lithosphere                  (40 <= LT <= 100 km) '
+Write(99,*)'Lower lithosphere               (Thick =   40 km) '
+Write(99,*)'Upper mantle                 (280 <= Thick <=340) '
+Write(99,*)'Transition zone                 (Thick =  250 km) '
+Write(99,*)'Lower mantle 1                  (Thick =  590 km) '
+Write(99,*)'Lower mantle 2 down to the CMB                    '
+!
+IF(iv==1) THEN
+Write(*,*) 'VM5a viscosity model (PREM-averaged)              '
+Write(*,*) 'Lithosphere                  (40 <= LT <= 100 km) '
+Write(*,*) 'Lower lithosphere               (Thick =   40 km) '
+Write(*,*) 'Upper mantle                 (280 <= Thick <=340) '
+Write(*,*) 'Transition zone                 (Thick =  250 km) '
+Write(*,*) 'Lower mantle 1                  (Thick =  590 km) '
+Write(*,*) 'Lower mantle 2 down to the CMB                    '
+ENDIF
+!
+nroots=4*nv
+!
+If((LT < 40q0 .OR. LT > 100q0) .and. iv==0) Then
+Write(99,*) 'ERROR in Sbr SPEC: The LT parameter is out of bounds'
+Write(99,*) 'It must be  40  <= LT <=100 km   for NV=5 and CODE=0'
+Write(99,*) '**** JOB ABORTED ***********************************';STOP
+endif
+If((LT < 40q0 .OR. LT > 100q0) .and. iv==1) Then
+Write(*,*)  'ERROR in Sbr SPEC: The LT parameter is out of bounds'
+Write(*,*)  'It must be  40  <= LT <=100 km   for NV=5 and CODE=0'
+Write(*,*)  '**** JOB ABORTED ***********************************';STOP
+endif
+!
+!
+r(6)    = rade
+r(5)    = rade-LT
+r(4)    = rade-LT-40._qp  
+r(3)    = rade-420._qp   ! 420 km depth discontinuity
+r(2)    = rade-670._qp   ! 670       "        "
+r(1)    = rade-1260._qp  ! 1260      "        "
+r(0)    = rcmb           ! CMB radius
+!
+!
+ call prem(r(0), 0.q0, rmu(0), rho(0))  ! Core 
+ call prem(r(1), r(0), rmu(1), rho(1))  ! Lower mantle
+ call prem(r(2), r(1), rmu(2), rho(2))  ! Lower mantle
+ call prem(r(3), r(2), rmu(3), rho(3))  ! Transition zone
+ call prem(r(4), r(3), rmu(4), rho(4))  ! Upper mantle
+ call prem(r(5), r(4), rmu(5), rho(5))  ! Lower lithosphere
+ call prem(r(6), r(5), rmu(6), rho(6))  ! Lithosphere
+rmu (0) = 0._qp  
+!
+endif 
+!
+!
+!
+ENDIF  ! Endif on NV=5
 !
 !
 !
