@@ -33,6 +33,8 @@
 !      - DM, May 10, 2021
 !        Added the VM5a model (NV=5, CODE=0) and the
 !        VM7 model (NV=8, CODE=0)
+!      - DM, Nov 29, 2022
+!        Implementation of the degree 1 loading LN
 !
  module STRATA 
 ! defines the kinds an PI 
@@ -9029,6 +9031,29 @@ call inversa (l, r (nl - 1), rho (nl), aco (nl), g (nl - 1), c, d)
 !
 matela = matmul (a + rmu (nl) * b, c + d / rmu (nl) )  
 !
+!
+!Pj1 projector 
+	pj1(:,:)=0.q0 
+	pj2(:,:)=0.q0 
+!
+if(l==1) then 
+	pj1(1,1)=1.q0
+	pj1(2,2)=1.q0
+	pj1(3,5)=1.q0
+!
+	pj2(1,3)=1.q0
+	pj2(2,4)=1.q0
+	pj2(3,5)=1.q0
+else 
+	pj1(1,1)=1.q0
+	pj1(2,2)=1.q0
+	pj1(3,5)=1.q0
+!
+	pj2(1,3)=1.q0
+	pj2(2,4)=1.q0
+	pj2(3,6)=1.q0
+endif
+!
 sinist_2 = matmul (pj2, matela); sinist_1 = matmul (pj1, matela)  
 !
 ! 
@@ -9490,13 +9515,15 @@ gamma = (2._qp * float (l) + 1._qp) / 4._qp / pi / r (nv+1) / r (nv+1)
 if (char == 1) then  
     bcs (1) = - g (nv+1) * gamma  
     bcs (2) = 0._qp  
-    bcs (3) = - 4._qp * pi * ggg * gamma  
+	if(l.ne.1) bcs (3) = - 4._qp * pi * ggg * gamma  
+	if(l.eq.1) bcs (3) = 0._qp  
 endif  
 !
 if (char == 0) then
     bcs (1) = 0._qp  
     bcs (2) = 0._qp  
     bcs (3) = -4._qp * pi * ggg * gamma  
+	if(l.eq.1) STOP '*** ERROR: Tidal conditions are not defined at degree 1'
 endif  
 end subroutine bf
 !
